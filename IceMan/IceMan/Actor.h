@@ -5,5 +5,4 @@
 
 // Students:  Add code to this file, Actor.cpp, StudentWorld.h, and StudentWorld.cpp
 //comment added
-//Another commented added - Josch A
 #endif // ACTOR_H_
