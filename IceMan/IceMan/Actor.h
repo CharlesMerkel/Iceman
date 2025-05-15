@@ -10,7 +10,168 @@
 // private : _NameOfThing()
 // public : NameOfThing()
 
+class Actor : public GraphObject
+{
+public:
+	Actor(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) : m_imageID(imageID), m_visible(false), m_x(startX), m_y(startY),
+		m_destX(startX), m_destY(startY), m_brightness(1.0),
+		m_animationNumber(0), m_direction(dir), m_size(size), m_depth(depth)
+	{
+		setVisible(true);
+	}
+	void doSomething()
+	{
 
-// Students:  Add code to this file, Actor.cpp, StudentWorld.h, and StudentWorld.cpp
-//comment added
+	}
+private:
+	//ID
+	//starting direction
+	//depth
+	//size
+	//location (colum, row)
+	//setVisible(T)
+};
+
+class Iceman : public Actor
+{
+public:
+	Iceman() 
+	{
+		//ID = IID_PLAYER
+		//starting location is x = 30, y = 60
+		//facing right
+		//depth = 0
+		//size = 1.0
+		 
+		 
+		//starting health = 10
+		//water ammo = 5
+		//sonar ammo = 1
+		//gold ammo = 0
+
+		//setVisible(true);
+	}
+	void DecreaseHealth()
+	{
+		_health--;
+		if (_health <= 0)
+		{
+			//kill player by changing to death state
+		}
+	}
+	void SonarAmmoIncrease()
+	{
+		_playerScore = (_playerScore + 75);
+		_sonarAmmo++;
+	}
+	void GoldAmmoIncrease()
+	{
+		_playerScore = (_playerScore + 10);
+		_goldAmmo++;
+	}
+	void WaterAmmoIncrease()
+	{
+		_playerScore = (_playerScore + 100);
+		_waterAmmo = (_waterAmmo + 5);
+	}
+	void OilGet()
+	{
+		_playerScore = (_playerScore + 1000);
+		_oilcount++;
+	}
+	void SpawnEnemyGold()
+	{
+		//check count of current gold, must be greater than 0
+		//choose location for spawning (under player)
+		//create gold gameobject
+		//set id = IID_GOLD
+		//setVisible(F)
+		//goldAmmoDecrease();
+		//toggle on collision with enemy
+	}
+	int GetScore()
+	{
+		return _playerScore;
+	}
+	void LoseLife()
+	{
+		_lives--;
+	}
+private:
+	int _health = 10;
+	int _waterAmmo = 5;
+	int _sonarAmmo = 1;
+	int _goldAmmo = 0;
+	int _playerScore = 0;
+	int _oilcount = 0;
+	int _lives = 3;
+};
+class PickUp : public Actor
+{
+public:
+	PickUp()
+	{
+		//ID = determine on spawn
+		//starting location is determined on spawn
+		//facing right
+		//depth = determined on spawn
+		//size = 1.0
+
+		//setVisible(true);
+		//playerCollision(true);
+	}
+	void ShowPickup()
+	{
+		Actor :: depth = 0;
+		setVisible(true);
+	}
+	void SonarPickup()
+	{
+		//call Iceman sonarAmmoIncrease();
+		//delete this gameobject
+	}
+	void GoldPickup()
+	{
+		//call Iceman goldAmmoIncrease();
+		//delete this gameobject
+	}
+	void WaterPickup()
+	{
+		//call Iceman waterAmmoIncrease();
+		//delete this gameobject
+	}
+	void SpawnGold()
+	{
+		//choose location for spawning
+		//create this gameobject
+		//set id = IID_GOLD
+		//setVisible(false);
+		//toggle on collision with player
+	}
+	void SpawnWater()
+	{
+		//choose location for spawning
+		//create this gameobject
+		//set id = IID_WATER_POOL
+		//setVisible(true);
+		//toggle on collision with player
+	}
+	void SpawnSonar()
+	{
+		//check to see if sonar is already there
+		//spawn in preset location
+		//id = IID_SONAR
+		//setVisible(ture)
+	}
+	void SpawnOil()
+	{
+		//check to see if oil is already there
+		//spawn in preset location
+		//id = IID_BARREL
+		//setVisible(ture)
+	}
+private:
+	bool _pickUpExists = false;
+};
+
 #endif // ACTOR_H_
