@@ -31,28 +31,28 @@ public:
 private:
 };
 
-class Oil : public Actor
+class Oil : public PickUp
 {
 public:
 
 private:
 };
 
-class Gold : public Actor
+class Gold : public PickUp
 {
 public:
 
 private:
 };
 
-class Sonar : public Actor
+class Sonar : public PickUp
 {
 public:
 
 private:
 };
 
-class WaterPool : public Actor
+class WaterPool : public PickUp
 {
 public:
 
