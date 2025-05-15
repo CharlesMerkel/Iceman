@@ -15,11 +15,28 @@ public:
 	{
 	}
 
+	// Initializes data structures used to keep track of your game's virtual world
+	// Construct a new oil field (map) that meets the requirements stated in page 16 & 17
+	// Allocate & insert a valid 'Iceman' object into the game world at the proper location
 	virtual int init()
 	{
 		return GWSTATUS_CONTINUE_GAME;
 	}
 
+	// Must update the status text on the top of the screen with the latest information
+	// (e.g., the user's current score , the remaining bonus score for the level, etc.)
+	// - - - 
+	// Must ask all of the actors that are currently active in the game world to do something
+	// - If an actor does something that causes the Iceman to give up, the move() method should return GWSTATUS_PLAYER_DIED
+	// - If the Iceman collects all of the barrels (Win condition) play SOUND_FINISHED_LEVEL and reutrn GWSTATUS_FINISHED_LEVEL
+	// - - -
+	// Must delete any actors that need to be removed from the game during this tick & remove them from your STL container that tracks them.
+	// - Protester run to top right corner after lost all hp
+	// - Boulder falls down and breaks on the bottom
+	// - Gold Nugget when player picks it up
+	// - Waterpool duration
+	// - Squirt goes away after reaching maximum distance
+	// - Others
 	virtual int move()
 	{
 		// This code is here merely to allow the game to build, run, and terminate after you hit enter a few times.
