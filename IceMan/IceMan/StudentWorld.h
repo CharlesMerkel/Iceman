@@ -37,6 +37,13 @@ public:
 	// - Waterpool duration
 	// - Squirt goes away after reaching maximum distance
 	// - Others
+	// - - - 
+	// Returns GWSTATUS_: PLAYER_DIED, CONTINUE_GAME, FINISHED_LEVEL when it returns at the end of a tick
+	// - - - 
+	// Give each actor a chance to do something... (pg. 20)
+	// Add new Actors during each tick... (pg. 20 & 21)
+	// Remove dead actors after each tick... (pg. 21)
+	// Updates display text... (pg. 21)
 	virtual int move()
 	{
 		// This code is here merely to allow the game to build, run, and terminate after you hit enter a few times.
@@ -45,6 +52,9 @@ public:
 		return GWSTATUS_PLAYER_DIED;
 	}
 
+	// Create Classes for All Actors:
+	// Iceman, Regular Protesters, Hardcore Protesters, Squirts of water, Barrels of Oil, Boulders, Gold Nuggets, Sonar Kits, Water pools, Ice
+	// Define base classes whenever any classes use the same code
 	virtual void cleanUp()
 	{
 	}
