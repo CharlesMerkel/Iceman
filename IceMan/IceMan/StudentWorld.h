@@ -52,9 +52,7 @@ public:
 		return GWSTATUS_PLAYER_DIED;
 	}
 
-	// Create Classes for All Actors:
-	// Iceman, Regular Protesters, Hardcore Protesters, Squirts of water, Barrels of Oil, Boulders, Gold Nuggets, Sonar Kits, Water pools, Ice
-	// Define base classes whenever any classes use the same code
+	// Self-Explanatory, deletes every entity and makes new ones
 	virtual void cleanUp()
 	{
 	}
