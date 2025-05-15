@@ -13,9 +13,10 @@
 class Actor : public GraphObject
 {
 public:
-	Actor(int imageID, int startX, int startY, Direction dir = right, double size = 1.0, unsigned int depth = 0) : m_imageID(imageID), m_visible(false), m_x(startX), m_y(startY),
-		m_destX(startX), m_destY(startY), m_brightness(1.0),
-		m_animationNumber(0), m_direction(dir), m_size(size), m_depth(depth)
+	Actor(int imageID, int startX, int startY, Direction dir = right, double size = 1.0,
+		unsigned int depth = 0) : GraphObject(imageID, startX, startY, dir, size, depth)
+
+		//m_brightness(1.0), m_animationNumber(0), m_direction(dir), m_destX(startX), m_destY(startY), 
 	{
 		setVisible(true);
 	}
@@ -23,6 +24,8 @@ public:
 	{
 
 	}
+
+	virtual ~Actor() = default;
 private:
 	//ID
 	//starting direction
@@ -174,4 +177,67 @@ private:
 	bool _pickUpExists = false;
 };
 
+
+class Ice : public Actor
+{
+public:
+
+private:
+};
+
+class Boulder : public Actor
+{
+public:
+
+private:
+};
+
+class Squirt : public Actor
+{
+public:
+
+private:
+};
+
+class Oil : public PickUp
+{
+public:
+
+private:
+};
+
+class Gold : public PickUp
+{
+public:
+
+private:
+};
+
+class Sonar : public PickUp
+{
+public:
+
+private:
+};
+
+class WaterPool : public PickUp
+{
+public:
+
+private:
+};
+
+class Protesters : public Actor
+{
+public:
+
+private:
+};
+
+class HardcoreProtesters : public Actor
+{
+public:
+
+private:
+};
 #endif // ACTOR_H_
