@@ -2,6 +2,7 @@
 #define ACTOR_H_
 
 #include "GraphObject.h"
+#include <queue>
 //variables
 // private : _nameOfThing
 // public : nameOfThing
