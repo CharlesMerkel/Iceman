@@ -131,6 +131,20 @@ public:
 	{
 		_lives--;
 	}
+	virtual void doSomething()
+	{
+		//check for user input
+		//move in direction
+		//check for collision with boulder
+		//check for collision with ice
+		//check for collision with water pool
+		//check for collision with gold
+		//check for collision with sonar
+		//check for collision with oil barrel
+
+		//this also handles the spawning of gold at the current player location
+		//spawn water attacks facing the direction the player is facing
+	}
 private:
 	int _health = 10;
 	int _waterAmmo = 5;
