@@ -36,18 +36,48 @@ private:
 	//setVisible(T)
 };
 
-class Iceman : public Actor
+// Neutral Actors
+class Ice : public Actor
 {
 public:
-	Iceman() 
+
+private:
+};
+
+class Boulder : public Actor
+{
+public:
+
+private:
+};
+
+class Squirt : public Actor
+{
+public:
+
+private:
+};
+
+// Actors that have HP
+class HasHP : public Actor
+{
+public:
+
+private:
+};
+
+class Iceman : public HasHP
+{
+public:
+	Iceman()
 	{
 		//ID = IID_PLAYER
 		//starting location is x = 30, y = 60
 		//facing right
 		//depth = 0
 		//size = 1.0
-		 
-		 
+
+
 		//starting health = 10
 		//water ammo = 5
 		//sonar ammo = 1
@@ -110,6 +140,29 @@ private:
 	int _oilcount = 0;
 	int _lives = 3;
 };
+
+class Protesters : public HasHP
+{
+public:
+
+private:
+};
+
+// Differentiating Protester Stats
+class RegularProtesters : public Protesters {
+public:
+
+private:
+};
+
+class HardcoreProtesters : public Protesters
+{
+public:
+
+private:
+};
+
+// PickUp Actors
 class PickUp : public Actor
 {
 public:
@@ -178,28 +231,6 @@ private:
 	bool _pickUpExists = false;
 };
 
-
-class Ice : public Actor
-{
-public:
-
-private:
-};
-
-class Boulder : public Actor
-{
-public:
-
-private:
-};
-
-class Squirt : public Actor
-{
-public:
-
-private:
-};
-
 class Oil : public PickUp
 {
 public:
@@ -228,17 +259,4 @@ public:
 private:
 };
 
-class Protesters : public Actor
-{
-public:
-
-private:
-};
-
-class HardcoreProtesters : public Actor
-{
-public:
-
-private:
-};
 #endif // ACTOR_H_
