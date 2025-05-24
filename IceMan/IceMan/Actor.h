@@ -40,7 +40,13 @@ private:
 class Ice : public Actor
 {
 public:
+	Ice(int imageID, int startX, int startY, Direction dir = right, double size = 1.0,
+		unsigned int depth = 3) : Actor(IID_ICE, startX, startY, dir, size, depth)
+	{ setVisible(true);}
 
+	virtual void doSomething() { ; }
+
+	virtual ~Ice() { ; }
 private:
 };
 
