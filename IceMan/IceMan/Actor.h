@@ -44,26 +44,38 @@ public:
 private:
 };
 
-class Boulder : public Actor
-{
-public:
+//class Boulder : public Actor
+//{
+//public:
+//
+//private:
+//};
 
-private:
-};
-
-class Squirt : public Actor
-{
-public:
-
-private:
-};
+//class Squirt : public Actor
+//{
+//public:
+//
+//private:
+//};
 
 // Actors that have HP
 class HasHP : public Actor
 {
 public:
-
+	void DecreaseHealth()
+	{
+		_health--;
+		if (_health <= 0)
+		{
+			//kill player by changing to death state
+		}
+	}
+	void SetHealth(int health)
+	{
+		_health = health;
+	}
 private:
+	int _health = 1;
 };
 
 class Iceman : public HasHP
@@ -76,6 +88,7 @@ public:
 		//facing right
 		//depth = 0
 		//size = 1.0
+		//setalth(10); //starting health
 
 
 		//starting health = 10
@@ -85,14 +98,7 @@ public:
 
 		//setVisible(true);
 	}
-	void DecreaseHealth()
-	{
-		_health--;
-		if (_health <= 0)
-		{
-			//kill player by changing to death state
-		}
-	}
+
 	void SonarAmmoIncrease()
 	{
 		_playerScore = (_playerScore + 75);
@@ -146,7 +152,6 @@ public:
 		//spawn water attacks facing the direction the player is facing
 	}
 private:
-	int _health = 10;
 	int _waterAmmo = 5;
 	int _sonarAmmo = 1;
 	int _goldAmmo = 0;
@@ -155,122 +160,122 @@ private:
 	int _lives = 3;
 };
 
-class Protesters : public HasHP
-{
-public:
-
-private:
-};
+//class Protesters : public HasHP
+//{
+//public:
+//
+//private:
+//};
 
 // Differentiating Protester Stats
-class RegularProtesters : public Protesters {
-public:
+//class RegularProtesters : public Protesters {
+//public:
+//
+//private:
+//};
 
-private:
-};
-
-class HardcoreProtesters : public Protesters
-{
-public:
-
-private:
-};
+//class HardcoreProtesters : public Protesters
+//{
+//public:
+//
+//private:
+//};
 
 // PickUp Actors
-class PickUp : public Actor
-{
-public:
-	PickUp()
-	{
-		//ID = determine on spawn
-		//starting location is determined on spawn
-		//facing right
-		//depth = determined on spawn
-		//size = 1.0
-
-		//setVisible(true);
-		//playerCollision(true);
-	}
-	void ShowPickup()
-	{
-		Actor :: depth = 0;
-		setVisible(true);
-	}
-	void SonarPickup()
-	{
-		//call Iceman sonarAmmoIncrease();
-		//delete this gameobject
-	}
-	void GoldPickup()
-	{
-		//call Iceman goldAmmoIncrease();
-		//delete this gameobject
-	}
-	void WaterPickup()
-	{
-		//call Iceman waterAmmoIncrease();
-		//delete this gameobject
-	}
-	void SpawnGold()
-	{
-		//choose location for spawning
-		//create this gameobject
-		//set id = IID_GOLD
-		//setVisible(false);
-		//toggle on collision with player
-	}
-	void SpawnWater()
-	{
-		//choose location for spawning
-		//create this gameobject
-		//set id = IID_WATER_POOL
-		//setVisible(true);
-		//toggle on collision with player
-	}
-	void SpawnSonar()
-	{
-		//check to see if sonar is already there
-		//spawn in preset location
-		//id = IID_SONAR
-		//setVisible(ture)
-	}
-	void SpawnOil()
-	{
-		//check to see if oil is already there
-		//spawn in preset location
-		//id = IID_BARREL
-		//setVisible(ture)
-	}
-private:
-	bool _pickUpExists = false;
-};
-
-class Oil : public PickUp
-{
-public:
-
-private:
-};
-
-class Gold : public PickUp
-{
-public:
-
-private:
-};
-
-class Sonar : public PickUp
-{
-public:
-
-private:
-};
-
-class WaterPool : public PickUp
-{
-public:
-
-private:
-};
+//class PickUp : public Actor
+//{
+//public:
+//	PickUp()
+//	{
+//		//ID = determine on spawn
+//		//starting location is determined on spawn
+//		//facing right
+//		//depth = determined on spawn
+//		//size = 1.0
+//
+//		//setVisible(true);
+//		//playerCollision(true);
+//	}
+//	void ShowPickup()
+//	{
+//		Actor :: depth = 0;
+//		setVisible(true);
+//	}
+//	void SonarPickup()
+//	{
+//		//call Iceman sonarAmmoIncrease();
+//		//delete this gameobject
+//	}
+//	void GoldPickup()
+//	{
+//		//call Iceman goldAmmoIncrease();
+//		//delete this gameobject
+//	}
+//	void WaterPickup()
+//	{
+//		//call Iceman waterAmmoIncrease();
+//		//delete this gameobject
+//	}
+//	void SpawnGold()
+//	{
+//		//choose location for spawning
+//		//create this gameobject
+//		//set id = IID_GOLD
+//		//setVisible(false);
+//		//toggle on collision with player
+//	}
+//	void SpawnWater()
+//	{
+//		//choose location for spawning
+//		//create this gameobject
+//		//set id = IID_WATER_POOL
+//		//setVisible(true);
+//		//toggle on collision with player
+//	}
+//	void SpawnSonar()
+//	{
+//		//check to see if sonar is already there
+//		//spawn in preset location
+//		//id = IID_SONAR
+//		//setVisible(ture)
+//	}
+//	void SpawnOil()
+//	{
+//		//check to see if oil is already there
+//		//spawn in preset location
+//		//id = IID_BARREL
+//		//setVisible(ture)
+//	}
+//private:
+//	bool _pickUpExists = false;
+//};
+//
+//class Oil : public PickUp
+//{
+//public:
+//
+//private:
+//};
+//
+//class Gold : public PickUp
+//{
+//public:
+//
+//private:
+//};
+//
+//class Sonar : public PickUp
+//{
+//public:
+//
+//private:
+//};
+//
+//class WaterPool : public PickUp
+//{
+//public:
+//
+//private:
+//};
 
 #endif // ACTOR_H_

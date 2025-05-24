@@ -1,7 +1,21 @@
 ﻿  Actor.cpp
   StudentWorld.cpp
-  GameController.cpp
-  GameWorld.cpp
-  main.cpp
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(42,2): error C2512: 'Actor': no appropriate default constructor available
+  (compiling source file 'Actor.cpp')
+      C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(13,7):
+      see declaration of 'Actor'
+  
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(116,2): error C2512: 'Actor': no appropriate default constructor available
+  (compiling source file 'Actor.cpp')
+      C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(13,7):
+      see declaration of 'Actor'
+  
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(128,12): error C2039: 'depth': is not a member of 'Actor'
+  (compiling source file 'Actor.cpp')
+      C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(13,7):
+      see declaration of 'Actor'
+  
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(128,12): error C2065: 'depth': undeclared identifier
+  (compiling source file 'Actor.cpp')
+  
   Generating Code...
-  IceMan.vcxproj -> C:\Users\charl\source\repos\Iceman\IceMan\Debug\IceMan.exe
