@@ -67,7 +67,7 @@ public:
 		_health--;
 		if (_health <= 0)
 		{
-			//kill player by changing to death state
+			//calls the actor's die function
 		}
 	}
 	void SetHealth(int health)
