@@ -21,10 +21,7 @@ public:
 	{
 		setVisible(true);
 	}
-	void doSomething()
-	{
-
-	}
+	virtual void doSomething() = 0;
 
 	virtual ~Actor() = default;
 private:
