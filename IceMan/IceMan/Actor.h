@@ -15,11 +15,12 @@ class Actor : public GraphObject
 {
 public:
 	Actor(int imageID, int startX, int startY, Direction dir = right, double size = 1.0,
-		unsigned int depth = 0) : GraphObject(imageID, startX, startY, dir, size, depth)
+		unsigned int depth = 0, StudentWorld* ptrStudWrld) : GraphObject(imageID, startX, startY, dir, size, depth)
 
 		//m_brightness(1.0), m_animationNumber(0), m_direction(dir), m_destX(startX), m_destY(startY), 
 	{
 		setVisible(true);
+		_ptrStudentWorld = ptrStudWrld;
 	}
 	virtual void doSomething() = 0;
 
@@ -31,6 +32,8 @@ private:
 	//size
 	//location (colum, row)
 	//setVisible(T)
+
+	StudentWorld* _ptrStudentWorld;
 };
 
 // Neutral Actors
@@ -38,8 +41,8 @@ class Ice : public Actor
 {
 public:
 	Ice(int imageID, int startX, int startY, Direction dir = right, double size = 1.0,
-		unsigned int depth = 3) : Actor(IID_ICE, startX, startY, dir, size, depth)
-	{ setVisible(true);}
+		unsigned int depth = 3, StudentWorld* ptrStudWrld) : Actor(IID_ICE, startX, startY, dir, size, depth, ptrStudWrld)
+	{ setVisible(true); }
 
 	virtual void doSomething() { ; }
 
@@ -50,14 +53,14 @@ private:
 //class Boulder : public Actor
 //{
 //public:
-//
+// Boulder() : Actor(IID_ICE, startX, startY, dir, size, depth, ptrStudWrld)
 //private:
 //};
 
 //class Squirt : public Actor
 //{
 //public:
-//
+// Squirt() : Actor(IID_ICE, startX, startY, dir, size, depth, ptrStudWrld)
 //private:
 //};
 
