@@ -43,6 +43,8 @@ public:
 	}
 
 private:
+	int _numIce;
+	Ice* _ptrIce [3600];
 	Iceman* _iceman;
 };
 
