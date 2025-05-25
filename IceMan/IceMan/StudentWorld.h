@@ -41,11 +41,29 @@ public:
 		delete _iceman;
 		_iceman = nullptr;
 	}
+	
+	// Other/Misc functions
+	void SpawnIce() {
+		int i = 0;
+		while (i < _numIce) {
+			for (int x = 0; x < 60; x++) {
+				for (int y = 0; y < 60; y++) {
+					if (x >= 30 && x <= 33 && y > 3) { ; }
+					else {
+						_ptrIce[i] = new Ice(x, y, this);
+						i++;
+					}
+				}
+			}
+
+		}
+	}
 
 private:
 	int _numIce;
 	Ice* _ptrIce [3600];
 	Iceman* _iceman;
 };
+
 
 #endif // STUDENTWORLD_H_

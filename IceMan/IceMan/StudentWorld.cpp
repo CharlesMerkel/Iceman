@@ -24,24 +24,12 @@ GameWorld* createStudentWorld(string assetDir)
 
 // Init - Initializes the game world: ice, boulders, gold, oil, the Iceman thenmself.
 //        and also determines the number of actors based off of the current level.
-/*
+
 int StudentWorld::init() {
 	_numIce = 3600;
-	int i = 0;
-	while (i < _numIce) {
-		for (int x = 0; x < 60; x++) {
-			for (int y = 0; y < 60; y++) {
-				if (x >= 30 && x <= 33 && y > 3) { ; }
-				else {
-					_ptrIce[i] = new Ice(x, y, this);
-					i++;
-				}
-			}
-		}
-
-	}
+	SpawnIce();
 }
-*/
+
 
 // Move - The Main game logic, updates the display, spawns most of the actors, has the
 //        probablity of spawning hardcore protesters, spawns most of the Pickups
