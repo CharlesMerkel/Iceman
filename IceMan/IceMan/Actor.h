@@ -11,20 +11,26 @@
 // private : _NameOfThing()
 // public : NameOfThing()
 
+class StudentWorld; // Forward declaration to avoid circular dependency
+
 class Actor : public GraphObject
 {
 public:
 	Actor(int imageID, int startX, int startY, Direction dir = right, double size = 1.0,
-		unsigned int depth = 0, StudentWorld* ptrStudWrld) : GraphObject(imageID, startX, startY, dir, size, depth)
+		unsigned int depth = 0, StudentWorld* ptrStudWrld)
+		: GraphObject(imageID, startX, startY, dir, size, depth), _ptrStudentWorld(ptrStudWrld)
 
 		//m_brightness(1.0), m_animationNumber(0), m_direction(dir), m_destX(startX), m_destY(startY), 
 	{
 		setVisible(true);
-		_ptrStudentWorld = ptrStudWrld;
 	}
+	//pure virtual function
 	virtual void doSomething() = 0;
-
+	//virtual destructor
 	virtual ~Actor() = default;
+
+protected:
+	StudentWorld* getWorld() const{	return _ptrStudentWorld;}
 private:
 	//ID
 	//starting direction
@@ -68,6 +74,13 @@ private:
 class HasHP : public Actor
 {
 public:
+	HasHP(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* ptrStudWrld, int initialHealth)
+		: Actor(imageID, startX, startY, dir, size, depth, ptrStudWrld), _health(initialHealth)
+	{
+
+	}
+	virtual ~HasHP() = default;
+
 	void DecreaseHealth()
 	{
 		_health--;
@@ -76,55 +89,27 @@ public:
 			//calls the actor's die function
 		}
 	}
-	void SetHealth(int health)
-	{
-		_health = health;
-	}
-private:
+	void SetHealth(int health) { _health = health; }
+	//Returns true if ths actor has more than 0 health
+	bool isAlive() const { return _health > 0; }
+protected:
+	virtual void die() = 0; // pure virtual function to be implemented by derived classes
 	int _health = 1;
 };
 
 class Iceman : public HasHP
 {
 public:
-	Iceman()
+	Iceman(StudentWorld* world)
+		: HasHP(IID_PLAYER, 30, 60, right, 1.0, 0, world, 10),
+		_waterAmmo(5), _sonarAmmo(1), _goldAmmo(0), _playerScore(0), _oilCount(0), _lives(3)
 	{
-		//ID = IID_PLAYER
-		//starting location is x = 30, y = 60
-		//facing right
-		//depth = 0
-		//size = 1.0
-		//setalth(10); //starting health
-
-
-		//starting health = 10
-		//water ammo = 5
-		//sonar ammo = 1
-		//gold ammo = 0
-
-		//setVisible(true);
+		setVisible(true);
 	}
-
-	void SonarAmmoIncrease()
-	{
-		_playerScore = (_playerScore + 75);
-		_sonarAmmo++;
-	}
-	void GoldAmmoIncrease()
-	{
-		_playerScore = (_playerScore + 10);
-		_goldAmmo++;
-	}
-	void WaterAmmoIncrease()
-	{
-		_playerScore = (_playerScore + 100);
-		_waterAmmo = (_waterAmmo + 5);
-	}
-	void OilGet()
-	{
-		_playerScore = (_playerScore + 1000);
-		_oilcount++;
-	}
+	void SonarAmmoIncrease() { _playerScore += 75; _sonarAmmo++; }
+	void GoldAmmoIncrease() { _playerScore += 10; _goldAmmo++; }
+	void WaterAmmoIncrease(){ _playerScore += 100; _waterAmmo += 5; }
+	void OilGet() { _playerScore += 1000; _oilcount++; }
 	void SpawnEnemyGold()
 	{
 		//check count of current gold, must be greater than 0
@@ -135,16 +120,11 @@ public:
 		//goldAmmoDecrease();
 		//toggle on collision with enemy
 	}
-	int GetScore()
+	int GetScore() { return _playerScore; }
+	void LoseLife() { _lives--;	}
+	virtual void doSomething() override
 	{
-		return _playerScore;
-	}
-	void LoseLife()
-	{
-		_lives--;
-	}
-	virtual void doSomething()
-	{
+		if (!isAlive()) { return; } // If the player is dead, return immediately
 		//check for user input
 		//move in direction
 		//check for collision with boulder
@@ -157,7 +137,15 @@ public:
 		//this also handles the spawning of gold at the current player location
 		//spawn water attacks facing the direction the player is facing
 	}
+	virtual void die() override
+	{
+		// Handle player death logic here, such as resetting the game or showing a game over screen
+		// For now, we will just set the player to not visible and reset health
+		setVisible(false);
+		SetHealth(10); // Reset health for next life
+	}
 private:
+	int _oilCount = 0; // number of oil barrels collected
 	int _waterAmmo = 5;
 	int _sonarAmmo = 1;
 	int _goldAmmo = 0;

@@ -1,21 +1,18 @@
 ﻿  Actor.cpp
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(19,7): error C2548: 'Actor::Actor': missing default argument for parameter 7
+  (compiling source file 'Actor.cpp')
+  
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(49,5): error C2548: 'Ice::Ice': missing default argument for parameter 7
+  (compiling source file 'Actor.cpp')
+  
   StudentWorld.cpp
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(42,2): error C2512: 'Actor': no appropriate default constructor available
-  (compiling source file 'Actor.cpp')
-      C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(13,7):
-      see declaration of 'Actor'
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(19,7): error C2548: 'Actor::Actor': missing default argument for parameter 7
+  (compiling source file 'StudentWorld.cpp')
   
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(116,2): error C2512: 'Actor': no appropriate default constructor available
-  (compiling source file 'Actor.cpp')
-      C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(13,7):
-      see declaration of 'Actor'
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(49,5): error C2548: 'Ice::Ice': missing default argument for parameter 7
+  (compiling source file 'StudentWorld.cpp')
   
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(128,12): error C2039: 'depth': is not a member of 'Actor'
-  (compiling source file 'Actor.cpp')
-      C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(13,7):
-      see declaration of 'Actor'
-  
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(128,12): error C2065: 'depth': undeclared identifier
-  (compiling source file 'Actor.cpp')
-  
+  GameController.cpp
+  GameWorld.cpp
+  main.cpp
   Generating Code...

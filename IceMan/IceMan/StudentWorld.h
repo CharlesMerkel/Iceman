@@ -22,11 +22,13 @@ public:
 
 	virtual int init()
 	{
+		_iceman = new Iceman(this);
 		return GWSTATUS_CONTINUE_GAME;
 	}
 
 	virtual int move()
 	{
+		_iceman->doSomething(); // Calls the doSomething function of the iceman
 		// This code is here merely to allow the game to build, run, and terminate after you hit enter a few times.
 		// Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
 		decLives();
@@ -34,9 +36,14 @@ public:
 	}
 
 	// Self-Explanatory, deletes every entity and makes new ones
-	virtual void cleanUp();
+	virtual void cleanUp()
+	{
+		delete _iceman;
+		_iceman = nullptr;
+	}
 
 private:
+	Iceman* _iceman;
 };
 
 #endif // STUDENTWORLD_H_
