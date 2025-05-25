@@ -1,4 +1,5 @@
 #include "StudentWorld.h"
+#include "Actor.h"
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -26,11 +27,42 @@ GameWorld* createStudentWorld(string assetDir)
 //        and also determines the number of actors based off of the current level.
 
 int StudentWorld::init() {
-	_numIce = 3600;
-	SpawnIce();
+	_iceman = new Iceman(this);
+
+	return GWSTATUS_CONTINUE_GAME;
 }
 
+int StudentWorld::move() {
+	_iceman->doSomething(); //let the iceman act this tick
 
+	return GWSTATUS_CONTINUE_GAME;
+}
+
+void StudentWorld::cleanUp() {
+	delete _iceman; //delete the iceman
+	_iceman = nullptr;
+}
+
+void StudentWorld::SpawnIce() 
+{
+	int i = 0;
+	while (i < _numIce) 
+	{
+		for (int x = 0; x < 60; x++) 
+		{
+			for (int y = 0; y < 60; y++) 
+			{
+				if (x >= 30 && x <= 33 && y > 3) { ; }
+				else 
+				{
+					_ptrIce[i] = new Ice(x, y, this);
+					i++;
+				}
+			}
+		}
+
+	}
+}
 // Move - The Main game logic, updates the display, spawns most of the actors, has the
 //        probablity of spawning hardcore protesters, spawns most of the Pickups
 //        & finally checks if the level is completed or if the player died to 
