@@ -17,7 +17,7 @@ class Actor : public GraphObject
 {
 public:
 	Actor(int imageID, int startX, int startY, Direction dir = right, double size = 1.0,
-		unsigned int depth = 0, StudentWorld* ptrStudWrld)
+		unsigned int depth = 0, StudentWorld* ptrStudWrld = nullptr)
 		: GraphObject(imageID, startX, startY, dir, size, depth), _ptrStudentWorld(ptrStudWrld)
 
 		//m_brightness(1.0), m_animationNumber(0), m_direction(dir), m_destX(startX), m_destY(startY), 
@@ -46,9 +46,11 @@ private:
 class Ice : public Actor
 {
 public:
-	Ice(int imageID, int startX, int startY, Direction dir = right, double size = 1.0,
-		unsigned int depth = 3, StudentWorld* ptrStudWrld) : Actor(IID_ICE, startX, startY, dir, size, depth, ptrStudWrld)
-	{ setVisible(true); }
+	Ice(int startX, int startY, StudentWorld* ptrStudWrld)
+		: Actor(IID_ICE, startX, startY, right, 0.25, 3, ptrStudWrld)
+	{
+		setVisible(true);
+	}
 
 	virtual void doSomething() { ; }
 
@@ -58,15 +60,18 @@ private:
 
 //class Boulder : public Actor
 //{
-//public:
-// Boulder() : Actor(IID_ICE, startX, startY, dir, size, depth, ptrStudWrld)
+//Boulder(int startX, int startY, StudentWorld* ptrStudWrld)
+//	: Actor(IID_BOULDER, startX, startY, down, 1.0, 1, ptrStudWrld)
+//{
+//	setVisible(true);
+//}
 //private:
 //};
 
 //class Squirt : public Actor
 //{
 //public:
-// Squirt() : Actor(IID_ICE, startX, startY, dir, size, depth, ptrStudWrld)
+// Squirt(int startX, int startY, StudentWorld* ptrStudWrld) : Actor(IID_ICE, startX, startY, dir, size, depth, ptrStudWrld)
 //private:
 //};
 

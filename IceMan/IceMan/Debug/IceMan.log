@@ -1,18 +1,7 @@
 ﻿  Actor.cpp
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(19,7): error C2548: 'Actor::Actor': missing default argument for parameter 7
-  (compiling source file 'Actor.cpp')
-  
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(49,5): error C2548: 'Ice::Ice': missing default argument for parameter 7
-  (compiling source file 'Actor.cpp')
-  
   StudentWorld.cpp
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(19,7): error C2548: 'Actor::Actor': missing default argument for parameter 7
-  (compiling source file 'StudentWorld.cpp')
-  
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(49,5): error C2548: 'Ice::Ice': missing default argument for parameter 7
-  (compiling source file 'StudentWorld.cpp')
-  
   GameController.cpp
   GameWorld.cpp
   main.cpp
   Generating Code...
+  IceMan.vcxproj -> C:\Users\charl\source\repos\Iceman\IceMan\Debug\IceMan.exe
