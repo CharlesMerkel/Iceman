@@ -26,11 +26,11 @@ public:
 	
 	// Other/Misc functions
 	void SpawnIce();
+
 private:
 	int _numIce = 3600;
 	Ice* _ptrIce[3600] = {};
 	Iceman* _iceman;
 };
-
 
 #endif // STUDENTWORLD_H_

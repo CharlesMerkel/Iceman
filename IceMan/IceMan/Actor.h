@@ -42,7 +42,7 @@ private:
 	StudentWorld* _ptrStudentWorld;
 };
 
-// Neutral Actors
+// --- Neutral Actors
 class Ice : public Actor
 {
 public:
@@ -75,7 +75,7 @@ private:
 //private:
 //};
 
-// Actors that have HP
+// --- Actors that have HP
 class HasHP : public Actor
 {
 public:
@@ -180,7 +180,7 @@ private:
 //private:
 //};
 
-// PickUp Actors
+// --- PickUp Actors
 //class PickUp : public Actor
 //{
 //public:

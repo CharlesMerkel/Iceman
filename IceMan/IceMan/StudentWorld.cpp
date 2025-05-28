@@ -32,43 +32,31 @@ int StudentWorld::init() {
 	return GWSTATUS_CONTINUE_GAME;
 }
 
+// Move - The Main game logic, updates the display, spawns most of the actors, has the
+//        probablity of spawning hardcore protesters, spawns most of the Pickups & finally 
+//        checks if the level is completed or if the player died to start the next map.
+
 int StudentWorld::move() {
 	_iceman->doSomething(); //let the iceman act this tick
 
 	return GWSTATUS_CONTINUE_GAME;
 }
 
-void StudentWorld::cleanUp() {
-	delete _iceman; //delete the iceman
-	_iceman = nullptr;
-}
-
-void StudentWorld::SpawnIce() 
-{
-	int i = 0;
-	while (i < _numIce) 
-	{
-		for (int x = 0; x < 60; x++) 
-		{
-			for (int y = 0; y < 60; y++) 
-			{
-				if (x >= 30 && x <= 33 && y > 3) { ; }
-				else 
-				{
-					_ptrIce[i] = new Ice(x, y, this);
-					i++;
-				}
-			}
-		}
-
-	}
-}
-// Move - The Main game logic, updates the display, spawns most of the actors, has the
-//        probablity of spawning hardcore protesters, spawns most of the Pickups
-//        & finally checks if the level is completed or if the player died to 
-//        start the next map.
 // Clean_Up - Self-explanatory, deletes every actor & ice and resets their positions.
-// 
+
+void StudentWorld::cleanUp() {
+	delete _iceman; //deletes the iceman
+	_iceman = nullptr;
+
+	/*
+	//deletes ice
+	for (int i = 0; i < _numIce; i++) {
+		delete _ptrIce[i];
+		_ptrIce[i] = nullptr;
+	}
+	*/
+}
+
 //  - Actor Management
 // 
 // Can_Face - Checks if the Actor can face the Iceman based off of its coordinates &
@@ -105,6 +93,26 @@ void StudentWorld::SpawnIce()
 // Squirt_Water - Creates a squirt object from the player
 // Sonar_Used - Makes all actors within a 12 unit radius from the player visible.
 
+//  - Misc Functions
 
+void StudentWorld::SpawnIce()
+{
+	int i = 0;
+	while (i < _numIce)
+	{
+		for (int x = 0; x < 60; x++)
+		{
+			for (int y = 0; y < 60; y++)
+			{
+				if (x >= 30 && x <= 33 && y > 3) { ; }
+				else
+				{
+					_ptrIce[i] = new Ice(x, y, this);
+					i++;
+				}
+			}
+		}
 
+	}
+}
 
