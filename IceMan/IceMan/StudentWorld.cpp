@@ -29,6 +29,7 @@ GameWorld* createStudentWorld(string assetDir)
 int StudentWorld::init() {
 	_iceman = new Iceman(this);
 
+	SpawnIce();
 	return GWSTATUS_CONTINUE_GAME;
 }
 
