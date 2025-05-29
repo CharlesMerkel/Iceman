@@ -95,19 +95,18 @@ void StudentWorld::cleanUp() {
 
 //  - Misc Functions
 
-void StudentWorld::SpawnIce()
-{
+void StudentWorld::SpawnIce(){
+
 	int i = 0;
-	for (int x = 0; x < 64; x++)
-	{
-		for (int y = 0; y < 60; y++)
-		{
-			if (x >= 30 && x <= 33 && y > 3) { ; }
-			else
-			{
-				_ptrIce[i] = new Ice(x, y, this);
-				i++;
-			}
+
+	for (int x = 0; x < 64; x++){
+
+		for (int y = 0; y < 60; y++){
+
+			if (x >= 30 && x <= 33 && y > 3) { ; } // Starts the tunnel for the Iceman to go through
+
+			else{ _ptrIce[i++] = new Ice(x, y, this); } // Spawns Ice!
+
 		}
 	}
 }
