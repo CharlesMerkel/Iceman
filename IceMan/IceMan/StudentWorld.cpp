@@ -27,9 +27,10 @@ GameWorld* createStudentWorld(string assetDir)
 //        and also determines the number of actors based off of the current level.
 
 int StudentWorld::init() {
-	_iceman = new Iceman(this);
 
 	SpawnIce();
+	_iceman = new Iceman(this);
+
 	return GWSTATUS_CONTINUE_GAME;
 }
 
@@ -49,13 +50,11 @@ void StudentWorld::cleanUp() {
 	delete _iceman; //deletes the iceman
 	_iceman = nullptr;
 
-	/*
 	//deletes ice
 	for (int i = 0; i < _numIce; i++) {
 		delete _ptrIce[i];
 		_ptrIce[i] = nullptr;
 	}
-	*/
 }
 
 //  - Actor Management
@@ -99,21 +98,17 @@ void StudentWorld::cleanUp() {
 void StudentWorld::SpawnIce()
 {
 	int i = 0;
-	while (i < _numIce)
+	for (int x = 0; x < 64; x++)
 	{
-		for (int x = 0; x < 60; x++)
+		for (int y = 0; y < 60; y++)
 		{
-			for (int y = 0; y < 60; y++)
+			if (x >= 30 && x <= 33 && y > 3) { ; }
+			else
 			{
-				if (x >= 30 && x <= 33 && y > 3) { ; }
-				else
-				{
-					_ptrIce[i] = new Ice(x, y, this);
-					i++;
-				}
+				_ptrIce[i] = new Ice(x, y, this);
+				i++;
 			}
 		}
-
 	}
 }
 

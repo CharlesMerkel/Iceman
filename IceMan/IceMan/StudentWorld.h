@@ -28,8 +28,8 @@ public:
 	void SpawnIce();
 
 private:
-	int _numIce = 3600;
-	Ice* _ptrIce[3600] = {};
+	int _numIce = 3616;
+	Ice* _ptrIce[3616] = {};
 	Iceman* _iceman;
 };
 
