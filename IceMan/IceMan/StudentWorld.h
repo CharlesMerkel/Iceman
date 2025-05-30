@@ -3,12 +3,14 @@
 
 #include "GameWorld.h"
 #include "GameConstants.h"
-#include "Actor.h"
 #include "GameController.h"
 #include <vector>
 #include <string>
 #include <algorithm>
 
+
+class Ice;
+class Iceman;
 // Students:  Add code to this file, StudentWorld.cpp, Actor.h, and Actor.cpp
 
 // This file basically calls all the functions listed in StudentWorld.cpp

@@ -3,6 +3,7 @@
 
 #include "GraphObject.h"
 #include <queue>
+
 //variables
 // private : _nameOfThing
 // public : nameOfThing
@@ -11,270 +12,122 @@
 // private : _NameOfThing()
 // public : NameOfThing()
 
-class StudentWorld; // Forward declaration to avoid circular dependency
+class StudentWorld;  // Forward declaration
 
+// --- Base Actor Class ---
 class Actor : public GraphObject
 {
 public:
-	Actor(int imageID, int startX, int startY, Direction dir = right, double size = 1.0,
-		unsigned int depth = 0, StudentWorld* ptrStudWrld = nullptr)
-		: GraphObject(imageID, startX, startY, dir, size, depth), _ptrStudentWorld(ptrStudWrld)
+    Actor(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world);
+    virtual ~Actor() = default;
 
-		//m_brightness(1.0), m_animationNumber(0), m_direction(dir), m_destX(startX), m_destY(startY), 
-	{
-		setVisible(true);
-	}
-	//pure virtual function
-	virtual void doSomething() = 0;
-	//virtual destructor
-	virtual ~Actor() = default;
+    virtual void doSomething() = 0;
 
 protected:
-	StudentWorld* getWorld() const{	return _ptrStudentWorld;}
-private:
-	//ID
-	//starting direction
-	//depth
-	//size
-	//location (colum, row)
-	//setVisible(T)
+    StudentWorld* getWorld() const { return _world; }
 
-	StudentWorld* _ptrStudentWorld;
+private:
+    StudentWorld* _world;
 };
 
-// --- Neutral Actors
+// --- Neutral Actors ---
 class Ice : public Actor
 {
 public:
-	Ice(int startX, int startY, StudentWorld* ptrStudWrld)
-		: Actor(IID_ICE, startX, startY, right, 0.25, 3, ptrStudWrld)
-	{
-		setVisible(true);
-	}
-
-	virtual void doSomething() { ; }
-
-	virtual ~Ice() { ; }
-private:
+    Ice(int startX, int startY, StudentWorld* world);
+    virtual void doSomething() override;
 };
 
-//class Boulder : public Actor
-//{
-//Boulder(int startX, int startY, StudentWorld* ptrStudWrld)
-//	: Actor(IID_BOULDER, startX, startY, down, 1.0, 1, ptrStudWrld)
-//{
-//	setVisible(true);
-//}
-//private:
-//};
+class Boulder : public Actor
+{
+public:
+    Boulder(int startX, int startY, StudentWorld* world);
+    virtual void doSomething() override;
+};
 
-//class Squirt : public Actor
-//{
-//public:
-// Squirt(int startX, int startY, StudentWorld* ptrStudWrld) : Actor(IID_ICE, startX, startY, dir, size, depth, ptrStudWrld)
-//private:
-//};
+class Squirt : public Actor
+{
+public:
+    Squirt(int startX, int startY, Direction dir, StudentWorld* world);
+    virtual void doSomething() override;
+};
 
-// --- Actors that have HP
+// --- Actors with Health ---
 class HasHP : public Actor
 {
 public:
-	HasHP(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* ptrStudWrld, int initialHealth)
-		: Actor(imageID, startX, startY, dir, size, depth, ptrStudWrld), _health(initialHealth)
-	{
+    HasHP(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world, int initialHealth);
+    virtual ~HasHP() = default;
 
-	}
-	virtual ~HasHP() = default;
+    void decreaseHealth();
+    void setHealth(int health);
+    bool isAlive() const;
 
-	void DecreaseHealth()
-	{
-		_health--;
-		if (_health <= 0)
-		{
-			//calls the actor's die function
-		}
-	}
-	void SetHealth(int health) { _health = health; }
-	//Returns true if ths actor has more than 0 health
-	bool isAlive() const { return _health > 0; }
 protected:
-	virtual void die() = 0; // pure virtual function to be implemented by derived classes
-	int _health = 1;
+    virtual void die() = 0;
+    int _health;
 };
 
 class Iceman : public HasHP
 {
 public:
-	Iceman(StudentWorld* world)
-		: HasHP(IID_PLAYER, 30, 60, right, 1.0, 0, world, 10),
-		_waterAmmo(5), _sonarAmmo(1), _goldAmmo(0), _playerScore(0), _oilCount(0), _lives(3)
-	{
-		setVisible(true);
-	}
-	void SonarAmmoIncrease() { _playerScore += 75; _sonarAmmo++; }
-	void GoldAmmoIncrease() { _playerScore += 10; _goldAmmo++; }
-	void WaterAmmoIncrease(){ _playerScore += 100; _waterAmmo += 5; }
-	void OilGet() { _playerScore += 1000; _oilcount++; }
-	void SpawnEnemyGold()
-	{
-		//check count of current gold, must be greater than 0
-		//choose location for spawning (under player)
-		//create gold gameobject
-		//set id = IID_GOLD
-		//setVisible(F)
-		//goldAmmoDecrease();
-		//toggle on collision with enemy
-	}
-	int GetScore() { return _playerScore; }
-	void LoseLife() { _lives--;	}
-	virtual void doSomething() override
-	{
-		if (!isAlive()) { return; } // If the player is dead, return immediately
-		//check for user input
-		//move in direction
-		//check for collision with boulder
-		//check for collision with ice
-		//check for collision with water pool
-		//check for collision with gold
-		//check for collision with sonar
-		//check for collision with oil barrel
+    Iceman(StudentWorld* world);
+    virtual void doSomething() override;
+    virtual void die() override;
 
-		//this also handles the spawning of gold at the current player location
-		//spawn water attacks facing the direction the player is facing
-	}
-	virtual void die() override
-	{
-		// Handle player death logic here, such as resetting the game or showing a game over screen
-		// For now, we will just set the player to not visible and reset health
-		setVisible(false);
-		SetHealth(10); // Reset health for next life
-	}
+    void sonarAmmoIncrease();
+    void goldAmmoIncrease();
+    void waterAmmoIncrease();
+    void oilGet();
+    int getScore() const;
+    void loseLife();
+
 private:
-	int _oilCount = 0; // number of oil barrels collected
-	int _waterAmmo = 5;
-	int _sonarAmmo = 1;
-	int _goldAmmo = 0;
-	int _playerScore = 0;
-	int _oilcount = 0;
-	int _lives = 3;
+    int _oilCount, _waterAmmo, _sonarAmmo, _goldAmmo, _playerScore, _lives;
 };
 
-//class Protesters : public HasHP
-//{
-//public:
-//
-//private:
-//};
+// --- Pickups ---
+class PickUp : public Actor
+{
+public:
+    PickUp(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world);
+    virtual void doSomething() override;
 
-// Differentiating Protester Stats
-//class RegularProtesters : public Protesters {
-//public:
-//
-//private:
-//};
+protected:
+    void showPickup();
+    void sonarPickup();
+    void goldPickup();
+    void waterPickup();
+private:
+    bool _pickUpExists = false;
+};
 
-//class HardcoreProtesters : public Protesters
-//{
-//public:
-//
-//private:
-//};
+class Oil : public PickUp
+{
+public:
+    Oil(int startX, int startY, StudentWorld* world);
+    virtual void doSomething() override;
+};
 
-// --- PickUp Actors
-//class PickUp : public Actor
-//{
-//public:
-//	PickUp()
-//	{
-//		//ID = determine on spawn
-//		//starting location is determined on spawn
-//		//facing right
-//		//depth = determined on spawn
-//		//size = 1.0
-//
-//		//setVisible(true);
-//		//playerCollision(true);
-//	}
-//	void ShowPickup()
-//	{
-//		Actor :: depth = 0;
-//		setVisible(true);
-//	}
-//	void SonarPickup()
-//	{
-//		//call Iceman sonarAmmoIncrease();
-//		//delete this gameobject
-//	}
-//	void GoldPickup()
-//	{
-//		//call Iceman goldAmmoIncrease();
-//		//delete this gameobject
-//	}
-//	void WaterPickup()
-//	{
-//		//call Iceman waterAmmoIncrease();
-//		//delete this gameobject
-//	}
-//	void SpawnGold()
-//	{
-//		//choose location for spawning
-//		//create this gameobject
-//		//set id = IID_GOLD
-//		//setVisible(false);
-//		//toggle on collision with player
-//	}
-//	void SpawnWater()
-//	{
-//		//choose location for spawning
-//		//create this gameobject
-//		//set id = IID_WATER_POOL
-//		//setVisible(true);
-//		//toggle on collision with player
-//	}
-//	void SpawnSonar()
-//	{
-//		//check to see if sonar is already there
-//		//spawn in preset location
-//		//id = IID_SONAR
-//		//setVisible(ture)
-//	}
-//	void SpawnOil()
-//	{
-//		//check to see if oil is already there
-//		//spawn in preset location
-//		//id = IID_BARREL
-//		//setVisible(ture)
-//	}
-//private:
-//	bool _pickUpExists = false;
-//};
-//
-//class Oil : public PickUp
-//{
-//public:
-//
-//private:
-//};
-//
-//class Gold : public PickUp
-//{
-//public:
-//
-//private:
-//};
-//
-//class Sonar : public PickUp
-//{
-//public:
-//
-//private:
-//};
-//
-//class WaterPool : public PickUp
-//{
-//public:
-//
-//private:
-//};
+class Gold : public PickUp
+{
+public:
+    Gold(int startX, int startY, StudentWorld* world);
+    virtual void doSomething() override;
+};
+
+class Sonar : public PickUp
+{
+public:
+    Sonar(int startX, int startY, StudentWorld* world);
+    virtual void doSomething() override;
+};
+
+class WaterPool : public PickUp
+{
+public:
+    WaterPool(int startX, int startY, StudentWorld* world);
+    virtual void doSomething() override;
+};
 
 #endif // ACTOR_H_

@@ -39,6 +39,7 @@ int StudentWorld::init() {
 //        checks if the level is completed or if the player died to start the next map.
 
 int StudentWorld::move() {
+	if(_iceman)
 	_iceman->doSomething(); //let the iceman act this tick
 
 	return GWSTATUS_CONTINUE_GAME;
@@ -95,18 +96,16 @@ void StudentWorld::cleanUp() {
 
 //  - Misc Functions
 
-void StudentWorld::SpawnIce(){
-
+void StudentWorld::SpawnIce() 
+{
 	int i = 0;
-
-	for (int x = 0; x < 64; x++){
-
-		for (int y = 0; y < 60; y++){
-
-			if (x >= 30 && x <= 33 && y > 3) { ; } // Starts the tunnel for the Iceman to go through
-
-			else{ _ptrIce[i++] = new Ice(x, y, this); } // Spawns Ice!
-
+	for (int x = 0; x < 64; x++)
+	{
+		for (int y = 0; y < 60; y++)
+		{
+			if (x >= 30 && x <= 33 && y > 3)
+				continue; // Skip tunnel space
+			_ptrIce[i++] = new Ice(x, y, this);
 		}
 	}
 }
