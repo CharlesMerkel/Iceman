@@ -28,11 +28,14 @@ public:
 	
 	// Other/Misc functions
 	void SpawnIce();
+	bool removeIceAt(int x, int y);
 
 private:
 	int _numIce = 3616;
 	Ice* _ptrIce[3616] = {};
 	Iceman* _iceman;
 };
+
+
 
 #endif // STUDENTWORLD_H_

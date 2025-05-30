@@ -110,3 +110,17 @@ void StudentWorld::SpawnIce()
 	}
 }
 
+bool StudentWorld::removeIceAt(int x, int y)
+{
+	for (int i = 0; i < _numIce; ++i)
+	{
+		if (_ptrIce[i] && _ptrIce[i]->getX() == x && _ptrIce[i]->getY() == y)
+		{
+			delete _ptrIce[i];
+			_ptrIce[i] = nullptr;
+			// play sound effect for ice removal
+			return true;
+		}
+	}
+	return false; // No ice was removed at this location
+}

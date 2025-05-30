@@ -77,6 +77,17 @@ void Iceman::doSomething()
             break;
         }
     }
+	//this is the code for Iceman breaking ice
+    int icemanX = getX();
+    int icemanY = getY();
+
+    for (int dx = 0; dx < 4; ++dx)
+    {
+        for (int dy = 0; dy < 4; ++dy)
+        {
+            getWorld()->removeIceAt(icemanX + dx, icemanY + dy);
+        }
+    }
 }
 
 void Iceman::die()
