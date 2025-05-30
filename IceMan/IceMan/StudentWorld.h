@@ -20,7 +20,9 @@ class StudentWorld : public GameWorld
 {
 public:
 	StudentWorld(std::string assetDir)
-		: GameWorld(assetDir), _iceman(nullptr), _numIce(3600){}
+		: GameWorld(assetDir), _iceman(nullptr){}
+
+	~StudentWorld(); // Destructor to clean up memory
 
 	virtual int init() override;
 	virtual int move() override;
@@ -31,11 +33,9 @@ public:
 	bool removeIceAt(int x, int y);
 
 private:
-	int _numIce = 3616;
-	Ice* _ptrIce[3616] = {};
+	static const int _NUMIce = 3600;
+	std::vector<Ice*> _ptrIce;
 	Iceman* _iceman;
 };
-
-
 
 #endif // STUDENTWORLD_H_

@@ -45,6 +45,10 @@ Iceman::Iceman(StudentWorld* world)
 {
     setVisible(true);
 }
+Iceman::~Iceman() 
+{
+	setVisible(false);
+}
 
 void Iceman::doSomething()
 {
@@ -90,7 +94,7 @@ void Iceman::doSomething()
     }
 }
 
-void Iceman::die()
+void Iceman::die() //this is wrong Fixlater
 {
     setVisible(false);
     setHealth(10);
@@ -101,6 +105,11 @@ Ice::Ice(int startX, int startY, StudentWorld* world)
     : Actor(IID_ICE, startX, startY, right, 0.25, 3, world)
 {
     setVisible(true);
+}
+
+Ice::~Ice()
+{
+    setVisible(false);
 }
 
 void Ice::doSomething() { /* Ice is static; does nothing each tick */ }

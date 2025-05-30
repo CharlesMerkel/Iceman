@@ -12,10 +12,6 @@ GameWorld* createStudentWorld(string assetDir)
 	return new StudentWorld(assetDir);
 }
 
-// Students:  Add code to this file (if you wish), StudentWorld.h, Actor.h and Actor.cpp
-
-// All function names aren't set in stone.
-// 
 // Add StudentWorld's:
 //  - Display & Cleanup:
 // 
@@ -25,7 +21,6 @@ GameWorld* createStudentWorld(string assetDir)
 
 // Init - Initializes the game world: ice, boulders, gold, oil, the Iceman thenmself.
 //        and also determines the number of actors based off of the current level.
-
 int StudentWorld::init() {
 
 	SpawnIce();
@@ -37,7 +32,6 @@ int StudentWorld::init() {
 // Move - The Main game logic, updates the display, spawns most of the actors, has the
 //        probablity of spawning hardcore protesters, spawns most of the Pickups & finally 
 //        checks if the level is completed or if the player died to start the next map.
-
 int StudentWorld::move() {
 	if(_iceman)
 	_iceman->doSomething(); //let the iceman act this tick
@@ -46,16 +40,16 @@ int StudentWorld::move() {
 }
 
 // Clean_Up - Self-explanatory, deletes every actor & ice and resets their positions.
-
 void StudentWorld::cleanUp() {
 	delete _iceman; //deletes the iceman
 	_iceman = nullptr;
 
 	//deletes ice
-	for (int i = 0; i < _numIce; i++) {
-		delete _ptrIce[i];
-		_ptrIce[i] = nullptr;
+	for( Ice* ice : _ptrIce) 
+	{
+		delete ice;
 	}
+	_ptrIce.clear();
 }
 
 //  - Actor Management
@@ -86,7 +80,6 @@ void StudentWorld::cleanUp() {
 // 
 //  - Gameplay & Interactions
 // 
-// Remove_Ice - Attempts to remove ice from the grid at the specified coordinates. If successful, it returns true.
 // Near_Iceman - Checks if the Iceman is within a certain distance from a given coordinate.
 // Boulder_Annoyed - Allows the boulder to 'damage' any actor.
 // Protester_Annoyed - Allows the squirt object to damage protesters.
@@ -96,23 +89,26 @@ void StudentWorld::cleanUp() {
 
 //  - Misc Functions
 
+// Ice Functions
+// Spawn_Ice - Spawns ice in the grid, ensuring that the tunnel space is not filled with ice.
 void StudentWorld::SpawnIce() 
 {
-	int i = 0;
+	_ptrIce.clear();
 	for (int x = 0; x < 64; x++)
 	{
 		for (int y = 0; y < 60; y++)
 		{
 			if (x >= 30 && x <= 33 && y > 3)
 				continue; // Skip tunnel space
-			_ptrIce[i++] = new Ice(x, y, this);
+			_ptrIce.push_back(new Ice(x, y, this));
 		}
 	}
 }
 
+// Remove_Ice - Attempts to remove ice from the grid at the specified coordinates. If successful, it returns true.
 bool StudentWorld::removeIceAt(int x, int y)
 {
-	for (int i = 0; i < _numIce; ++i)
+	for (int i = 0; i < _ptrIce.size(); ++i)
 	{
 		if (_ptrIce[i] && _ptrIce[i]->getX() == x && _ptrIce[i]->getY() == y)
 		{
@@ -123,4 +119,9 @@ bool StudentWorld::removeIceAt(int x, int y)
 		}
 	}
 	return false; // No ice was removed at this location
+}
+
+//Destructor - Cleans up all actors and ice when the game world is destroyed. including forced closes.
+StudentWorld::~StudentWorld() {
+	cleanUp(); // Clean up all actors and ice
 }

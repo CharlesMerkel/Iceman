@@ -1,4 +1,5 @@
 ﻿  Actor.cpp
   StudentWorld.cpp
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(111,20): warning C4018: '<': signed/unsigned mismatch
   Generating Code...
   IceMan.vcxproj -> C:\Users\charl\source\repos\Iceman\IceMan\Debug\IceMan.exe

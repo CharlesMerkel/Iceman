@@ -35,6 +35,7 @@ class Ice : public Actor
 {
 public:
     Ice(int startX, int startY, StudentWorld* world);
+	~Ice() override;
     virtual void doSomething() override;
 };
 
@@ -72,6 +73,7 @@ class Iceman : public HasHP
 {
 public:
     Iceman(StudentWorld* world);
+    ~Iceman();
     virtual void doSomething() override;
     virtual void die() override;
 
@@ -85,6 +87,9 @@ public:
 private:
     int _oilCount, _waterAmmo, _sonarAmmo, _goldAmmo, _playerScore, _lives;
 };
+//class Protester : public HasHP
+//class RegularProtester : public Protester
+//class HardcoreProtester : public Protester
 
 // --- Pickups ---
 class PickUp : public Actor
