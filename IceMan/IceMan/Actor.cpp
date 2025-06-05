@@ -100,6 +100,62 @@ void Iceman::die() //this is wrong Fixlater
     setHealth(10);
 }
 
+// --- Protestor --
+Protester::Protester(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world)
+    : HasHP(imageID, startX, startY, dir, size, depth, world, 5) // 5 HP for Regular Protester, override for Hardcore
+{
+    setVisible(true);
+    _leavingField = false;
+    _stunned = false;
+    _restingTime = 0;
+}
+
+void Protester::doSomething()
+{
+    if (!isAlive()) return;
+
+    if (_restingTime > 0)
+    {
+        _restingTime--;
+        return;
+    }
+
+    // Basic protester logic goes here
+    // E.g., shout at player, walk toward player, etc.
+}
+
+void Protester::die()
+{
+    setVisible(false);
+    setLeaveField(); // Begin leaving the field
+}
+
+// --- RegularProtestor ---
+void RegularProtester::doSomething()
+{
+    Protester::doSomething(); // Extend or override behavior
+    // Additional logic for regular protester
+}
+
+void RegularProtester::die()
+{
+    Protester::die();
+    // Maybe play sound, add score, etc.
+}
+
+// --- HardcoreProtestor ---
+void HardcoreProtester::doSomething()
+{
+    Protester::doSomething();
+    // More aggressive pathfinding or resistance logic here
+}
+
+void HardcoreProtester::die()
+{
+    Protester::die();
+    // Different sound/score/etc
+}
+
 // --- Ice ---
 Ice::Ice(int startX, int startY, StudentWorld* world)
     : Actor(IID_ICE, startX, startY, right, 0.25, 3, world)

@@ -87,9 +87,59 @@ public:
 private:
     int _oilCount, _waterAmmo, _sonarAmmo, _goldAmmo, _playerScore, _lives;
 };
-//class Protester : public HasHP
-//class RegularProtester : public Protester
-//class HardcoreProtester : public Protester
+
+// --- Protester Base Class ---
+class Protester : public HasHP
+{
+public:
+    Protester(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world);
+
+    virtual ~Protester() = default;
+    virtual void doSomething() override;
+    virtual void die() override;
+
+    void setLeaveField(bool leave = true) { _leavingField = leave; }
+    bool isLeavingField() const { return _leavingField; }
+
+    void setStunned(bool stunned = true) { _stunned = stunned; }
+    bool isStunned() const { return _stunned; }
+
+    void setRestingTime(int time) { _restingTime = time; }
+    int getRestingTime() const { return _restingTime; }
+
+protected:
+    bool _leavingField = false;
+    bool _stunned = false;
+    int _restingTime = 0;
+};
+
+// --- Regular Protester ---
+class RegularProtester : public Protester
+{
+public:
+    RegularProtester(StudentWorld* world)
+        : Protester(IID_PROTESTER, 60, 60, left, 1.0, 0, world)
+    {
+        // Customize starting position or behavior as needed
+    }
+
+    virtual void doSomething() override;
+    virtual void die() override;
+};
+
+// --- Hardcore Protester ---
+class HardcoreProtester : public Protester
+{
+public:
+    HardcoreProtester(StudentWorld* world)
+        : Protester(IID_HARD_CORE_PROTESTER, 60, 60, left, 1.0, 0, world)
+    {
+        // Customize starting position or behavior as needed
+    }
+
+    virtual void doSomething() override;
+    virtual void die() override;
+};
 
 // --- Pickups ---
 class PickUp : public Actor

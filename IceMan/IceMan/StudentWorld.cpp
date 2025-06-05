@@ -26,6 +26,10 @@ int StudentWorld::init() {
 	SpawnIce();
 	_iceman = new Iceman(this);
 
+
+	// Spawn a RegularProtester
+	_actors.push_back(new RegularProtester(this));
+
 	return GWSTATUS_CONTINUE_GAME;
 }
 
@@ -43,6 +47,12 @@ int StudentWorld::move() {
 void StudentWorld::cleanUp() {
 	delete _iceman; //deletes the iceman
 	_iceman = nullptr;
+
+	//deletes all actors
+	for (Actor* actor : _actors) {
+		delete actor;
+	}
+	_actors.clear();
 
 	//deletes ice
 	for( Ice* ice : _ptrIce) 
