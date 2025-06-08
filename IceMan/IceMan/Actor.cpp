@@ -100,6 +100,13 @@ void Iceman::die() //this is wrong Fixlater
     setHealth(10);
 }
 
+bool Iceman::canTakeDamage() const
+{
+    if(getWorld()->isPlayerStunned())
+    {
+        return false; // Iceman is stunned, cannot take damage
+	}
+}
 // --- Protestor --
 Protester::Protester(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world)
     : HasHP(imageID, startX, startY, dir, size, depth, world, 5) // 5 HP for Regular Protester, override for Hardcore
@@ -114,6 +121,24 @@ void Protester::doSomething()
 {
     if (!isAlive()) return;
 
+    if (isLeavingField())
+    {
+        if (getX() == 60 && getY() == 60)
+        {
+			setVisible(false);
+            return;
+        }
+		//move toward exit
+
+
+        //rest after moving 
+        _restingTime = getWorld()->getRestTime();
+        return;
+    }
+
+
+
+
     if (_restingTime > 0)
     {
         _restingTime--;
@@ -126,8 +151,11 @@ void Protester::doSomething()
 
 void Protester::die()
 {
-    setVisible(false);
-    setLeaveField(); // Begin leaving the field
+    if (!isLeavingField())
+    {
+        setLeaveField();
+		// add pathing logic to exit the field
+    }
 }
 
 // --- RegularProtestor ---

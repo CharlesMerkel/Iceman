@@ -83,9 +83,11 @@ public:
     void oilGet();
     int getScore() const;
     void loseLife();
+    bool canTakeDamage() const;
 
 private:
     int _oilCount, _waterAmmo, _sonarAmmo, _goldAmmo, _playerScore, _lives;
+    bool _canTakeDamage = true;
 };
 
 // --- Protester Base Class ---

@@ -1,8 +1,53 @@
 ﻿  Actor.cpp
   StudentWorld.cpp
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(121,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.h(41,36): error C7568: argument list missing after assumed function template 'vector'
+  (compiling source file 'Actor.cpp')
+  
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.h(47,32): error C2061: syntax error: identifier 'Direction'
+  (compiling source file 'Actor.cpp')
+  
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.h(41,36): error C7568: argument list missing after assumed function template 'vector'
+  (compiling source file 'StudentWorld.cpp')
+  
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.h(47,32): error C2061: syntax error: identifier 'Direction'
+  (compiling source file 'StudentWorld.cpp')
+  
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(89,20): error C2511: 'void StudentWorld::Find_Protester(int,int,std::vector<Actor *,std::allocator<Actor *>> &)': overloaded member function not found in 'StudentWorld'
+      C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.h(24,7):
+      see declaration of 'StudentWorld'
+  
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(185,45): error C2061: syntax error: identifier 'Direction'
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(188,10): error C2065: 'dir': undeclared identifier
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(188,10): error C2050: switch expression not integral
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(189,7): error C2440: 'type cast': cannot convert from 'std::ios_base &(__cdecl *)(std::ios_base &)' to 'int'
+      C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(189,7):
+      There is no context in which this conversion is possible
+  
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(189,2): error C2046: illegal case
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(190,7): error C2440: 'type cast': cannot convert from 'std::ios_base &(__cdecl *)(std::ios_base &)' to 'int'
+      C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(190,7):
+      There is no context in which this conversion is possible
+  
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(190,2): error C2046: illegal case
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(191,7): error C2065: 'up': undeclared identifier
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(191,7): error C2131: expression did not evaluate to a constant
+      C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(191,7):
+      a non-constant (sub-)expression was encountered
+  
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(192,7): error C2065: 'down': undeclared identifier
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(192,7): error C2131: expression did not evaluate to a constant
+      C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(192,7):
+      a non-constant (sub-)expression was encountered
+  
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(199,15): error C2039: 'isAlive': is not a member of 'Boulder'
+      C:\Users\charl\source\repos\Iceman\IceMan\IceMan\Actor.h(42,7):
+      see declaration of 'Boulder'
+  
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(191,7): error C2051: case expression not constant
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(192,7): error C2051: case expression not constant
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(194,2): warning C4065: switch statement contains 'default' but no 'case' labels
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(247,20): warning C4018: '<': signed/unsigned mismatch
   GameController.cpp
   GameWorld.cpp
   main.cpp
   Generating Code...
-  IceMan.vcxproj -> C:\Users\charl\source\repos\Iceman\IceMan\Debug\IceMan.exe

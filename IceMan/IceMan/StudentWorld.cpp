@@ -5,6 +5,7 @@
 #include <string>
 #include <cmath>
 #include <iomanip>
+#include <algorithm>
 using namespace std;
 
 GameWorld* createStudentWorld(string assetDir)
@@ -62,31 +63,213 @@ void StudentWorld::cleanUp() {
 	_ptrIce.clear();
 }
 
-//  - Actor Management
-// 
-// Can_Face - Checks if the Actor can face the Iceman based off of its coordinates &
-//            current direction, returns false if unable.
-// Can_Add_Protester - Checks if a new protester can spawn based off of the level
-//                     and tick.
+//  --- Actor Management --
+ 
+//Checks if the Actor can face the Iceman based off of its coordinates &
+//current direction, returns false if unable.
+bool StudentWorld::Can_Face()
+{
+	return false; // Placeholder implementation, should be replaced with actual logic
+}        
+
+// Checks if a new protester can spawn based off of the level and tick.
+bool StudentWorld::Can_Add_Protester()
+{
+	return true; // Placeholder implementation, should be replaced with actual logic
+}
+
 // Can_Add_Waterpool - Checks if a waterpool can be added at a coordinate, ensuring that ice isn't
-//		           blocking the area.
+// blocking the area.
+bool StudentWorld::Can_Add_Waterpool(int x, int y)
+{
+	return true; // Placeholder implementation, should be replaced with actual logic
+}
 // Find_Protester - Searches and returns a protester within a 3x3 area around a point.
+void StudentWorld::Find_Protester(int x, int y, vector<Actor*>& foundProtesters)
+{
+	//for (Actor* actor : _actors) 
+	//{
+	//	if (actor->isProtester() && abs(actor->getX() - x) <= 3 && abs(actor->getY() - y) <= 3) 
+	//	{
+	//		foundProtesters.push_back(actor);
+	//	}
+	//}
+}
+
 // Remove_Dead_Game_Objects - Removes all dead actors & updates the actor's position.
-// 
-//  - Game State & Level Progression
-// 
+void StudentWorld::Remove_Dead_Game_Objects()
+{
+	//for (auto it = _actors.begin(); it != _actors.end();) 
+	//{
+	//	if ((*it)->isDead()) 
+	//	{
+	//		delete *it; // Delete the dead actor
+	//		it = _actors.erase(it); // Remove from the vector
+	//	} 
+	//	else 
+	//	{
+	//		++it; // Move to the next actor
+	//	}
+	//}
+}
+
+//  --- Game State & Level Progression ---
+
 // Finished_Level - Returns true if the player picked up all the oil.
+bool StudentWorld::Finished_Level()
+{
+	//// Check if all oil barrels have been picked up
+	//for (Actor* actor : _actors) 
+	//{
+	//	if (actor->isOilBarrel() && !actor->isPickedUp()) 
+	//	{
+	//		return false; // Not all oil barrels have been picked up
+	//	}
+	//}
+	return true; // All oil barrels have been picked up
+}
+
 // Player_Died - Checks if the player died, if so, then decrement lives and returns true.
+bool StudentWorld::Player_Died()
+{
+	//if(_iceman._health <= 0) // Check if the Iceman's health is zero or less
+	//{
+	//	// Decrement lives and return true to indicate player death
+	//	_iceman->decrementLives();
+	//	return true;
+	//}
+}
+
 // New_Direction - Generates a random direction for an actor to move, as long as it's not blocked.
+void StudentWorld::New_Direction()
+{
+	// Generate a random direction (0-3) for the actor to move
+	int direction = rand() % 4; // 0: up, 1: right, 2: down, 3: left
+	// Set the actor's direction based on the generated value
+	switch (direction) {
+	case 0:
+		// Move up
+		break;
+	case 1:
+		// Move right
+		break;
+	case 2:
+		// Move down
+		break;
+	case 3:
+		// Move left
+		break;
+	default:
+		break; // Should never happen
+	}
+}
+
 // Pickup_Oil - Marks an Oil barrel as being picked up and increments Oil Pickup counter.
-// 
-//  - Collision & Movement Checks
-// 
+void StudentWorld::Pickup_Oil()
+{
+		//for (Actor* actor : _actors) 
+	//{
+	//	if (actor->isOilBarrel() && !actor->isPickedUp()) 
+	//	{
+	//		actor->setPickedUp(true); // Mark the oil barrel as picked up
+	//		incrementOilCount(); // Increment the oil count
+	//		return; // Exit after picking up one oil barrel
+	//	}
+	//}
+}
+
+//  --- Collision & Movement Checks ---
+
 // Is_Boulder - Checks if there is a boulder in the specified direction from the given coordinates.
+bool StudentWorld::Is_Boulder(int x, int y, GraphObject::Direction dir) const
+{
+	// Calculate the adjacent tile based on direction
+	switch (dir) {
+	case GraphObject::left:  x -= 1; break;
+	case GraphObject::right: x += 1; break;
+	case GraphObject::up:    y += 1; break;
+	case GraphObject::down:  y -= 1; break;
+	default: break;
+	}
+
+	//// Now check if any actor at the new (x, y) is a Boulder
+	//for (Actor* actor : _actors) {
+	//	Boulder* b = dynamic_cast<Boulder*>(actor);
+	//	if (b && b->isAlive() && b->getX() == x && b->getY() == y) {
+	//		return true;
+	//	}
+	//}
+
+	return false;
+}
+
 // Is_Ice - Checks if there is ice at the given coordinates in a specified direction.
+bool StudentWorld::Is_Ice(int x, int y, GraphObject::Direction dir) const
+{
+	// Calculate the adjacent tile based on direction
+	switch (dir) {
+	case GraphObject::left:  x -= 1; break;
+	case GraphObject::right: x += 1; break;
+	case GraphObject::up:    y += 1; break;
+	case GraphObject::down:  y -= 1; break;
+	default: break;
+	}
+	// Check if there is ice at the new (x, y)
+	for (Ice* ice : _ptrIce) {
+		if (ice->getX() == x && ice->getY() == y) {
+			return true; // Ice found at the specified coordinates
+		}
+	}
+	return false; // No ice found
+}
+
 // No_Ice_Or_Boulder - Checks if there is neither ice nor a boulder in a specified direction from given coordinates.
+bool StudentWorld::No_Ice_Or_Boulder(int x, int y, GraphObject::Direction dir) const
+{
+	// Calculate the adjacent tile based on direction
+	switch (dir) {
+	case GraphObject::left:  x -= 1; break;
+	case GraphObject::right: x += 1; break;
+	case GraphObject::up:    y += 1; break;
+	case GraphObject::down:  y -= 1; break;
+	default: break;
+	}
+	// Check for ice at the new (x, y)
+	if (Is_Ice(x, y, dir)) {
+		return false; // Ice found
+	}
+	// Check for boulders at the new (x, y)
+	if (Is_Boulder(x, y, dir)) {
+		return false; // Boulder found
+	}
+	return true; // Neither ice nor boulder found
+}
+
 // Can_Fall - Checks if an object at given coords can fall downward (Check if no ice or boulder below it).
-// Can_Shout - Checks if the Iceman can be shouted again.
+bool StudentWorld::Can_Fall(int x, int y) const
+{
+	// Check if there is ice or a boulder directly below the given coordinates
+	if (Is_Ice(x, y - 1, GraphObject::down) || Is_Boulder(x, y - 1, GraphObject::down)) {
+		return false; // Cannot fall if there is ice or a boulder below
+	}
+	return true; // Can fall if no ice or boulder below
+}
+
+// Can_Shout - Checks if the Iceman can be shouted at again.
+bool StudentWorld::Can_Shout() const
+{
+	// Check if the Iceman can get shouted at again based on the current game state
+	if (_iceman && _iceman->canTakeDamage()) {
+		return true; // Iceman can get shouted at
+	}
+	return false; // Iceman cannot be shouted at
+}
+
+
+int StudentWorld::getRestTime() const
+{
+	return std::max(0, static_cast<int>(3 - getLevel() / 4));
+}
 // 
 //  - Gameplay & Interactions
 // 

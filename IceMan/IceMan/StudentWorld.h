@@ -1,9 +1,12 @@
 #ifndef STUDENTWORLD_H_
 #define STUDENTWORLD_H_
 
+#include "GraphObject.h"
+
 #include "GameWorld.h"
 #include "GameConstants.h"
 #include "GameController.h"
+
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -32,10 +35,32 @@ public:
 	virtual int move() override;
 	virtual void cleanUp() override;
 
-	// Other/Misc functions
+	//  --- Actor Management ---
+	bool Can_Face();
+	bool Can_Add_Protester();
+	bool Can_Add_Waterpool(int x, int y);
+	void Find_Protester(int x, int y, vector<Actor*>& foundProtesters);
+	void Remove_Dead_Game_Objects();
+	void Pickup_Oil();
+	void New_Direction();
+	
+	// --- Collision and Movement ---
+	bool Is_Boulder(int x, int y, GraphObject::Direction dir) const;
+	bool Is_Ice(int x, int y, GraphObject::Direction dir) const;
+	bool No_Ice_Or_Boulder(int x, int y, GraphObject::Direction dir) const;
+	bool Can_Fall(int x, int y) const;
+	bool Can_Shout() const;
+
+	//  --- Game State & Level Progression ---
+
+	bool Finished_Level();
+	bool Player_Died();
+
+
+	// --- Other/Misc functions ---
 	void SpawnIce();
 	bool removeIceAt(int x, int y);
-
+	int getRestTime() const;
 private:
 	static const int _NUMIce = 3600;
 	std::vector<Ice*> _ptrIce;
