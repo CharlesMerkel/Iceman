@@ -21,8 +21,8 @@ public:
     Actor(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world);
     virtual ~Actor() = default;
 
-    bool IsAlive() { return _swAlive; }
-    virtual void IsDead() { _swAlive = false; }
+    bool isAlive() { return _swAlive; }
+    virtual void setDead() { _swAlive = false; }
 
     virtual void doSomething() = 0;
 

@@ -270,13 +270,25 @@ int StudentWorld::getRestTime() const
 {
 	return std::max(0, static_cast<int>(3 - getLevel() / 4));
 }
-// 
-//  - Gameplay & Interactions
+
+//  - Gameplay & Interactions - [ None of these inteactions work ]
 // 
 // Near_Iceman - Checks if the Iceman is within a certain distance from a given coordinate.
+
 // Boulder_Annoyed - Allows the boulder to 'damage' any actor.
+void StudentWorld::Boulder_Annoyed(int x, int y)
+{
+	if (_iceman->getX() >= x - 3 && _iceman->getX() <= x + 3 && _iceman->getY() >= y - 3 && _iceman->getY() <= y + 3)
+	{ _iceman->die(); }
+
+	Protester_Annoyed(x, y, 100);
+}
+
 // Protester_Annoyed - Allows the squirt object to damage protesters.
-// 
+bool StudentWorld::Protester_Annoyed(int x, int y, int dmg)
+{
+// Input Protester Damage 
+}
 // Set_Position - Sets a 4x4 actor in a specified coordinate.
 void StudentWorld::Set_Position(int x, int y, char actortype)
 {

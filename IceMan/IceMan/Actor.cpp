@@ -107,6 +107,7 @@ bool Iceman::canTakeDamage() const
         return false; // Iceman is stunned, cannot take damage
 	}
 }
+
 // --- Protestor --
 Protester::Protester(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world)
     : HasHP(imageID, startX, startY, dir, size, depth, world, 5) // 5 HP for Regular Protester, override for Hardcore
@@ -198,7 +199,7 @@ Ice::~Ice()
 
 void Ice::doSomething() { /* Ice is static; does nothing each tick */ }
 
-// --- Boulder ---
+// --- Boulder --- [ Everything past this might not work ] 
 Boulder::Boulder(int startX, int startY, StudentWorld* world)
     : Actor(IID_BOULDER, startX, startY, down, 1.0, 1, world)
 {
@@ -226,7 +227,7 @@ void Boulder::doSomething() {
 
     else if (_bState == 2) {
         if (getWorld()->Can_Fall(getX(), getY() - 1)) {
-            getworld()->Set_Position(getX(), getY(), 0);
+            getWorld()->Set_Position(getX(), getY(), 0);
             moveTo(getX(), getY() - 1);
             // Needs both Boulder_Annoyed & Protester_Annoyed to function
             getWorld()->Set_Position(getX(), getY(), 'B');
@@ -243,7 +244,47 @@ Squirt::Squirt(int startX, int startY, Direction dir, StudentWorld* world)
     _sDistance = 0;
 }
 
-void Squirt::doSomething() { /* Implement Squirt behavior here */ }
+void Squirt::doSomething() { 
+    /* Implement Squirt behavior here */
+    if (getWorld()->Protester_Annoyed) { setDead; }
+    if (_sDistance == 4) { setDead; }
+
+    else if (getDirection() == up) {
+        if (!getWorld()->No_Ice_Or_Boulder(getX(), getY() + 1, up) || getY() >= 60) { setDead(); }
+
+        else {
+            moveTo(getX(), getY() + 1);
+            _sDistance++;
+        }
+    }
+
+    else if (getDirection() == down) {
+        if (!getWorld()->No_Ice_Or_Boulder(getX(), getY() - 1, down) || getY() <= 0) { setDead(); }
+
+        else {
+            moveTo(getX(), getY() - 1);
+            _sDistance++;
+        }
+    }
+
+    else if (getDirection() == left) {
+        if (!getWorld()->No_Ice_Or_Boulder(getX() - 1, getY(), left) || getX() <= 0) { setDead(); }
+
+        else {
+            moveTo(getX() - 1, getY());
+            _sDistance++;
+        }
+    }
+
+    else if (getDirection() == right) {
+        if (!getWorld()->No_Ice_Or_Boulder(getX() + 1, getY(), right) || getX() >= 60) { setDead(); }
+
+        else {
+            moveTo(getX() + 1, getY());
+            _sDistance++;
+        }
+    }
+}
 
 // --- PickUp ---
 PickUp::PickUp(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world)
@@ -260,25 +301,21 @@ void PickUp::doSomething()
 
 // --- Pickups (Oil, Gold, Sonar, WaterPool) ---
 Oil::Oil(int startX, int startY, StudentWorld* world)
-    : PickUp(IID_BARREL, startX, startY, right, 1.0, 2, world) {
-}
+    : PickUp(IID_BARREL, startX, startY, right, 1.0, 2, world) {;}
 
 void Oil::doSomething() { /* Oil logic */ }
 
 Gold::Gold(int startX, int startY, StudentWorld* world)
-    : PickUp(IID_GOLD, startX, startY, right, 1.0, 2, world) {
-}
+    : PickUp(IID_GOLD, startX, startY, right, 1.0, 2, world) {;}
 
 void Gold::doSomething() { /* Gold logic */ }
 
 Sonar::Sonar(int startX, int startY, StudentWorld* world)
-    : PickUp(IID_SONAR, startX, startY, right, 1.0, 2, world) {
-}
+    : PickUp(IID_SONAR, startX, startY, right, 1.0, 2, world) {;}
 
 void Sonar::doSomething() { /* Sonar logic */ }
 
 WaterPool::WaterPool(int startX, int startY, StudentWorld* world)
-    : PickUp(IID_WATER_POOL, startX, startY, right, 1.0, 2, world) {
-}
+    : PickUp(IID_WATER_POOL, startX, startY, right, 1.0, 2, world) {;}
 
 void WaterPool::doSomething() { /* WaterPool logic */ }
