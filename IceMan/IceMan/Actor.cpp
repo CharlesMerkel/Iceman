@@ -305,7 +305,23 @@ Oil::Oil(int startX, int startY, StudentWorld* world)
     setVisible(false);
 }
 
-void Oil::doSomething() { /* Oil logic */ }
+void Oil::doSomething() { 
+    /* Oil logic */
+    if (!isAlive()) { return; }
+
+    if (!isVisible() && getWorld()->Near_Iceman(getX(), getY(), 4)) {
+        setVisible(true);
+        return;
+    }
+
+    else if (getWorld()->Near_Iceman(getX(), getY(), 3)) {
+        setDead;
+        //play sfx
+        //insert function for increasing score
+        getWorld()->Pickup_Oil(getX(), getY());
+    }
+
+}
 
 Gold::Gold(int startX, int startY, StudentWorld* world)
     : PickUp(IID_GOLD, startX, startY, right, 1.0, 2, world) {

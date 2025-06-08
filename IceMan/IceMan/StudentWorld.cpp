@@ -272,9 +272,19 @@ int StudentWorld::getRestTime() const
 }
 
 //  - Gameplay & Interactions - [ None of these inteactions work ]
-// 
-// Near_Iceman - Checks if the Iceman is within a certain distance from a given coordinate.
 
+///
+/// [ None of these inteactions work ]
+/// 
+
+// Near_Iceman - Checks if the Iceman is within a certain distance from a given coordinate.
+bool StudentWorld::Near_Iceman(int x, int y, int amt) {
+	int dx = _iceman->getX() - x;
+	int dy = _iceman->getY() - y;
+
+	int distSqrt = dx * dx + dy * dy;
+	return distSqrt <= amt * amt;
+}
 // Boulder_Annoyed - Allows the boulder to 'damage' any actor.
 void StudentWorld::Boulder_Annoyed(int x, int y)
 {
