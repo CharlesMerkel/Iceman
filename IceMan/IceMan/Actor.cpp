@@ -202,10 +202,48 @@ void Ice::doSomething() { /* Ice is static; does nothing each tick */ }
 Boulder::Boulder(int startX, int startY, StudentWorld* world)
     : Actor(IID_BOULDER, startX, startY, down, 1.0, 1, world)
 {
+    _bState = 0;
     setVisible(true);
 }
 
-void Boulder::doSomething() { /* Implement Boulder behavior here */ }
+void Boulder::doSomething() { 
+    /* Implement Boulder behavior here */
+    if (!isAlive()) { return; }
+
+    if (_bState == 0) {
+        if (!getWorld()->is_Ice(getX(), getY() - 1, down) {
+            _bState = 1;
+            tick = 0;
+       }
+    }
+
+    else if (_bState == 1 && tick < 30) { tick++; }
+
+    else if (_bState == 1 && tick == 30) {
+        _bState = 2;
+        // start playing sfx
+    }
+
+    else if (_bState == 2) {
+        if (getWorld()->Can_Fall(getX(), getY() - 1)) {
+            getworld()->Set_Position(getX(), getY(), 0);
+            moveTo(getX(), getY() - 1);
+            // Needs both Boulder_Annoyed & Protester_Annoyed to function
+            getWorld()->Set_Position(getX(), getY(), 'B');
+        }
+        else if (!getWorld()->Can_Fall(getX(), getY() - 1)) { IsDead(); }
+    }
+}
+
+// --- Squirt ---
+Squirt::Squirt(int startX, int startY, Direction dir, StudentWorld* world)
+    : Actor(IID_WATER_SPURT, startX, startY, dir, 1.0, 1, world)
+{
+    setVisible(true);
+    _sDistance = 0;
+}
+
+void Squirt::doSomething() { /* Implement Squirt behavior here */ }
 
 // --- PickUp ---
 PickUp::PickUp(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world)
@@ -219,15 +257,6 @@ void PickUp::doSomething()
     // Placeholder logic for PickUp actions
     // This can be customized to check collisions, player interactions, etc.
 }
-
-// --- Squirt ---
-Squirt::Squirt(int startX, int startY, Direction dir, StudentWorld* world)
-    : Actor(IID_WATER_SPURT, startX, startY, dir, 1.0, 1, world)
-{
-    setVisible(true);
-}
-
-void Squirt::doSomething() { /* Implement Squirt behavior here */ }
 
 // --- Pickups (Oil, Gold, Sonar, WaterPool) ---
 Oil::Oil(int startX, int startY, StudentWorld* world)

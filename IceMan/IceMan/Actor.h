@@ -21,6 +21,9 @@ public:
     Actor(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world);
     virtual ~Actor() = default;
 
+    bool IsAlive() { return _swAlive; }
+    virtual void IsDead() { _swAlive = false; }
+
     virtual void doSomething() = 0;
 
 protected:
@@ -28,6 +31,7 @@ protected:
 
 private:
     StudentWorld* _world;
+    bool _swAlive;
 };
 
 // --- Neutral Actors ---
@@ -44,6 +48,10 @@ class Boulder : public Actor
 public:
     Boulder(int startX, int startY, StudentWorld* world);
     virtual void doSomething() override;
+
+private:
+    int _bState; // Boulder's State
+    int _tick;
 };
 
 class Squirt : public Actor
@@ -51,6 +59,9 @@ class Squirt : public Actor
 public:
     Squirt(int startX, int startY, Direction dir, StudentWorld* world);
     virtual void doSomething() override;
+
+private:
+    int _sDistance; 
 };
 
 // --- Actors with Health ---

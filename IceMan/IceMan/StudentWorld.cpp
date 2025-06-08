@@ -276,7 +276,14 @@ int StudentWorld::getRestTime() const
 // Near_Iceman - Checks if the Iceman is within a certain distance from a given coordinate.
 // Boulder_Annoyed - Allows the boulder to 'damage' any actor.
 // Protester_Annoyed - Allows the squirt object to damage protesters.
+// 
 // Set_Position - Sets a 4x4 actor in a specified coordinate.
+void StudentWorld::Set_Position(int x, int y, char actortype)
+{
+	for (int row = x; row != x + 4; row++)
+		for (int col = y; col != y + 4; col++)
+			_actorPositions[row][col] = actortype;
+}
 // Squirt_Water - Creates a squirt object from the player
 // Sonar_Used - Makes all actors within a 12 unit radius from the player visible.
 

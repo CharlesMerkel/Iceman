@@ -56,6 +56,8 @@ public:
 	bool Finished_Level();
 	bool Player_Died();
 
+	//  --- Gameplay & Interactions ---
+	void Set_Position(int x, int y, char actortype);
 
 	// --- Other/Misc functions ---
 	void SpawnIce();
@@ -65,6 +67,8 @@ private:
 	static const int _NUMIce = 3600;
 	std::vector<Ice*> _ptrIce;
 	Iceman* _iceman;
+
+	char _actorPositions[64][64];
 	std::list<Actor*> _actors; // List of actors in the game world
 };
 
