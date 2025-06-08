@@ -301,21 +301,33 @@ void PickUp::doSomething()
 
 // --- Pickups (Oil, Gold, Sonar, WaterPool) ---
 Oil::Oil(int startX, int startY, StudentWorld* world)
-    : PickUp(IID_BARREL, startX, startY, right, 1.0, 2, world) {;}
+    : PickUp(IID_BARREL, startX, startY, right, 1.0, 2, world) {
+    setVisible(false);
+}
 
 void Oil::doSomething() { /* Oil logic */ }
 
 Gold::Gold(int startX, int startY, StudentWorld* world)
-    : PickUp(IID_GOLD, startX, startY, right, 1.0, 2, world) {;}
+    : PickUp(IID_GOLD, startX, startY, right, 1.0, 2, world) {
+    setVisible(isVisible);
+    setPickup(exists);
+    setTick(100);
+}
 
 void Gold::doSomething() { /* Gold logic */ }
 
-Sonar::Sonar(int startX, int startY, StudentWorld* world)
-    : PickUp(IID_SONAR, startX, startY, right, 1.0, 2, world) {;}
+Sonar::Sonar(StudentWorld* world)
+    : PickUp(IID_SONAR, 0, 60, right, 1.0, 2, world) {
+    setVisible(true);
+    setPickup(true);
+}
 
 void Sonar::doSomething() { /* Sonar logic */ }
 
-WaterPool::WaterPool(int startX, int startY, StudentWorld* world)
-    : PickUp(IID_WATER_POOL, startX, startY, right, 1.0, 2, world) {;}
+WaterPool::WaterPool(StudentWorld* world)
+    : PickUp(IID_WATER_POOL, startX, startY, right, 1.0, 2, world) {
+    setVisible(true);
+    setPickup(true);
+}
 
 void WaterPool::doSomething() { /* WaterPool logic */ }

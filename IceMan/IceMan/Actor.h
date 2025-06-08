@@ -161,13 +161,33 @@ public:
     PickUp(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world);
     virtual void doSomething() override;
 
+    bool isVisible(){ return _pickVisible; }
+
+    void setVisible(bool vis) {
+        GraphObject::setVisible(vis);
+        _pickVisible = vis;
+    }
+
+    void setPickup(bool exists) { _pickUpExists = exists; }
+
+    bool isPickable() { return _pickUpExists; }
+
+    int getTick() { return tickSpan; }
+
+    void reduceTick() { tickSpan--; }
+
+    void setTick(int amt) { tickSpan = amt; }
+
 protected:
     void showPickup();
     void sonarPickup();
     void goldPickup();
     void waterPickup();
+
 private:
+    bool _pickVisible;
     bool _pickUpExists = false;
+    int _tickSpan;
 };
 
 class Oil : public PickUp
@@ -187,7 +207,7 @@ public:
 class Sonar : public PickUp
 {
 public:
-    Sonar(int startX, int startY, StudentWorld* world);
+    Sonar(StudentWorld* world);
     virtual void doSomething() override;
 };
 
