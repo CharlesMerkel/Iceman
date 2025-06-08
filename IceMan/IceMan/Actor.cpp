@@ -315,7 +315,7 @@ void Oil::doSomething() {
     }
 
     else if (getWorld()->Near_Iceman(getX(), getY(), 3)) {
-        setDead;
+        setDead();
         //play sfx
         //insert function for increasing score
         getWorld()->Pickup_Oil(getX(), getY());
@@ -330,7 +330,31 @@ Gold::Gold(int startX, int startY, StudentWorld* world)
     setTick(100);
 }
 
-void Gold::doSomething() { /* Gold logic */ }
+void Gold::doSomething() { 
+    /* Gold logic */
+    if (!isAlive()) { return; }
+
+    if (!isVisible && getWorld()->Near_Iceman(getX(), getY(), 3)) {
+        setDead();
+        //play sfx
+        //insert function for increasing score
+        getWorld()->Iceman_ptr->goldAmmoIncrease();
+    }
+
+    else if (!isPickable()) {
+        Actor* actor = getWorld()->Find_Protester(getX(), getY());
+
+        if (actor == nullptr) {
+            if (getTick() == 0) { setDead(); }
+
+            else { reduceTick(); }
+        }
+        else {
+            setDead();
+            //Bribe the actor
+        }
+    }
+}
 
 Sonar::Sonar(StudentWorld* world)
     : PickUp(IID_SONAR, 0, 60, right, 1.0, 2, world) {
@@ -338,7 +362,20 @@ Sonar::Sonar(StudentWorld* world)
     setPickup(true);
 }
 
-void Sonar::doSomething() { /* Sonar logic */ }
+void Sonar::doSomething() { 
+    /* Sonar logic */ 
+    if (!isAlive()) { return; }
+
+    if (getWorld()->Near_Iceman(getX(), getY(), 3)) {
+        setDead();
+        //play sfx
+        //increase score
+        getWorld()->Iceman_ptr()->sonarAmmoIncrease();
+    }
+
+    else if (getTick() == 0) { setDead(); }
+    reduceTick();
+}
 
 WaterPool::WaterPool(StudentWorld* world)
     : PickUp(IID_WATER_POOL, startX, startY, right, 1.0, 2, world) {
@@ -346,4 +383,17 @@ WaterPool::WaterPool(StudentWorld* world)
     setPickup(true);
 }
 
-void WaterPool::doSomething() { /* WaterPool logic */ }
+void WaterPool::doSomething() { 
+    /* WaterPool logic */
+    if (!isAlive()) { return; }
+
+    if (getWorld()->Near_Iceman(getX(), getY(), 3)) {
+        setDead();
+        //play sfx
+        //increase score
+        getWorld()->Iceman_ptr()->waterAmmoIncrease();
+    }
+
+    else if (getTick() == 0) { setDead(); }
+    reduceTick();
+}

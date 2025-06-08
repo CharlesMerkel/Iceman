@@ -88,9 +88,9 @@ public:
     virtual void doSomething() override;
     virtual void die() override;
 
-    void sonarAmmoIncrease();
-    void goldAmmoIncrease();
-    void waterAmmoIncrease();
+    void sonarAmmoIncrease() { _sonarAmmo++; }
+    void goldAmmoIncrease() { _goldAmmo++; }
+    void waterAmmoIncrease() { _waterAmmo += 5; }
     void oilGet();
     int getScore() const;
     void loseLife();

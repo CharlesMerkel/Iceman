@@ -57,7 +57,16 @@ public:
 	bool Player_Died();
 
 	//  --- Gameplay & Interactions ---
-	void Set_Position(int x, int y, char actortype);
+	///
+	/// [ None of these inteactions work ]
+	///
+
+	Iceman* Iceman_ptr() { return _iceman; }
+
+	bool Near_Iceman(int x, int y, int actortype);
+	void Boulder_Annoyed(int x, int y);
+	bool Protester_Annoyed(int x, int y, int dmg);
+	bool Set_Position(int x, int y, char actortype);
 
 	// --- Other/Misc functions ---
 	void SpawnIce();
