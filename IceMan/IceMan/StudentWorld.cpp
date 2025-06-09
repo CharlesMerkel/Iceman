@@ -84,7 +84,7 @@ bool StudentWorld::Can_Add_Waterpool(int x, int y)
 	return true; // Placeholder implementation, should be replaced with actual logic
 }
 // Find_Protester - Searches and returns a protester within a 3x3 area around a point.
-void StudentWorld::Find_Protester(int x, int y, vector<Actor*>& foundProtesters)
+void StudentWorld::Find_Protester(int x, int y, vector<Actor*> & foundProtesters)
 {
 	for (Actor* actor : _actors) 
 	{
@@ -175,7 +175,7 @@ void StudentWorld::New_Direction()
 }
 
 // Pickup_Oil - Marks an Oil barrel as being picked up and increments Oil Pickup counter.
-void StudentWorld::Pickup_Oil()
+void StudentWorld::Pickup_Oil(int x, int y)
 {
 		//for (Actor* actor : _actors) 
 	//{
@@ -309,12 +309,15 @@ bool StudentWorld::Protester_Annoyed(int x, int y, int dmg)
 }
 
 // Set_Position - Sets a 4x4 actor in a specified coordinate.
-void StudentWorld::Set_Position(int x, int y, char actortype)
+bool StudentWorld::Set_Position(int x, int y, char actortype)
 {
 	for (int row = x; row != x + 4; row++)
 		for (int col = y; col != y + 4; col++)
 			_actorPositions[row][col] = actortype;
+
+	return true;
 }
+
 // Squirt_Water - Creates a squirt object from the player
 // Sonar_Used - Makes all actors within a 12 unit radius from the player visible.
 
@@ -339,7 +342,7 @@ void StudentWorld::SpawnIce()
 // Remove_Ice - Attempts to remove ice from the grid at the specified coordinates. If successful, it returns true.
 bool StudentWorld::removeIceAt(int x, int y)
 {
-	for (int i = 0; i < _ptrIce.size(); ++i)
+	for (size_t i = 0; i < _ptrIce.size(); ++i)
 	{
 		if (_ptrIce[i] && _ptrIce[i]->getX() == x && _ptrIce[i]->getY() == y)
 		{

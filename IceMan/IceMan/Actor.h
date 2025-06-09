@@ -36,7 +36,8 @@ public:
     Actor(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world);
     virtual ~Actor() = default;
 
-    bool isAlive() { return _swAlive; }
+    // recommended v const
+    bool isAlive() const { return _swAlive; }
     virtual void setDead() { _swAlive = false; }
 
     virtual void doSomething() = 0;
@@ -70,8 +71,8 @@ public:
     virtual void doSomething() override;
 
 private:
-    int _bState; // Boulder's State
-    int _tick;
+    int _bState = 0; // Boulder's State
+    int _tick = 0;
 };
 
 class Squirt : public Actor
@@ -186,7 +187,8 @@ public:
     PickUp(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world);
     virtual void doSomething() override;
 
-    bool isVisible(){ return _pickVisible; }
+    //recommended v const
+    bool isVisible() const { return _pickVisible; }
 
     void setVisible(bool vis) {
         GraphObject::setVisible(vis);
@@ -197,7 +199,8 @@ public:
 
     virtual bool isPickedUp() const override { return !_pickUpExists; }
 
-    int getTick() { return _tickSpan; }
+    //recommended v const
+    int getTick() const { return _tickSpan; }
 
     void reduceTick() { _tickSpan--; }
 

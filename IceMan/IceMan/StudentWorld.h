@@ -27,6 +27,11 @@ class StudentWorld : public GameWorld
 public:
 	StudentWorld(std::string assetDir)
 		: GameWorld(assetDir), _iceman(nullptr) {
+		for (int x = 0; x < 64; ++x) {
+			for (int y = 0; y < 64; ++y) {
+				_actorPositions[x][y] = 0;
+			}
+		}
 	}
 
 	~StudentWorld(); // Destructor to clean up memory
@@ -41,7 +46,7 @@ public:
 	bool Can_Add_Waterpool(int x, int y);
 	void Find_Protester(int x, int y, std::vector<Actor*>& foundProtesters);
 	void Remove_Dead_Game_Objects();
-	void Pickup_Oil();
+	void Pickup_Oil(int x, int y);
 	void New_Direction();
 	
 	// --- Collision and Movement ---
@@ -78,7 +83,7 @@ private:
 	std::vector<Ice*> _ptrIce;
 	Iceman* _iceman;
 
-	char _actorPositions[64][64];
+	char _actorPositions[64][64] = {};
 	std::list<Actor*> _actors; // List of actors in the game world
 };
 

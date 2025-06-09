@@ -5,7 +5,7 @@ using namespace std;
 
 // --- Actor ---
 Actor::Actor(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world)
-    : GraphObject(imageID, startX, startY, dir, size, depth), _world(world)
+    : GraphObject(imageID, startX, startY, dir, size, depth), _world(world), _swAlive(true)
 {
     setVisible(true);
 }
@@ -105,7 +105,8 @@ bool Iceman::canTakeDamage() const
 
 bool Iceman::isStunned() const { return _isStunned; }
 
-void Iceman::setStunned(bool stunned) { _isStunned = stunned; }
+//void Iceman::setStunned(bool stunned) { _isStunned = stunned; } This was already defined in Actor.h
+void setStunned(bool stunned){}
 
 // --- Protestor --
 Protester::Protester(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world)
@@ -202,7 +203,6 @@ void Ice::doSomething() { /* Ice is static; does nothing each tick */ }
 Boulder::Boulder(int startX, int startY, StudentWorld* world)
     : Actor(IID_BOULDER, startX, startY, down, 1.0, 1, world)
 {
-    _bState = 0;
     setVisible(true);
 }
 
@@ -212,7 +212,7 @@ void Boulder::doSomething() {
 
     if (_bState == 0) 
     {
-        if (!getWorld()->is_Ice(getX(), getY(), GraphObject::down)) 
+        if (!getWorld()->Is_Ice(getX(), getY(), GraphObject::down)) 
         {
             _bState = 1;
             _tick = 0;
@@ -247,8 +247,8 @@ Squirt::Squirt(int startX, int startY, Direction dir, StudentWorld* world)
 
 void Squirt::doSomething() { 
     /* Implement Squirt behavior here */
-    if (getWorld()->Protester_Annoyed()) { setDead; }
-    if (_sDistance == 4) { setDead; }
+    if (getWorld()->Protester_Annoyed(getX(), getY(), 2)) { setDead();; }
+    if (_sDistance == 4) { setDead();; }
 
     else if (getDirection() == up) {
         if (!getWorld()->No_Ice_Or_Boulder(getX(), getY() + 1, up) || getY() >= 60) { setDead(); }
@@ -326,8 +326,8 @@ void Oil::doSomething() {
 
 Gold::Gold(int startX, int startY, StudentWorld* world)
     : PickUp(IID_GOLD, startX, startY, right, 1.0, 2, world) {
-    setVisible(isVisible);
-    setPickup(exists);
+    setVisible(true);
+    setPickup(true);
     setTick(100);
 }
 
@@ -335,7 +335,7 @@ void Gold::doSomething() {
     /* Gold logic */
     if (!isAlive()) { return; }
 
-    if (!isVisible && getWorld()->Near_Iceman(getX(), getY(), 3)) {
+    if (!isVisible() && getWorld()->Near_Iceman(getX(), getY(), 3)) {
         setDead();
         //play sfx
         //insert function for increasing score
@@ -343,9 +343,9 @@ void Gold::doSomething() {
     }
 
     else if (!isPickedUp()) {
-        Actor* actor = getWorld()->Find_Protester(getX(), getY(), //vector of actors);
-            );
-        if (actor == nullptr) {
+        std::vector<Actor*> protesters;
+        getWorld()->Find_Protester(getX(), getY(), protesters);
+        if (!protesters.empty()) {
             if (getTick() == 0) { setDead(); }
 
             else { reduceTick(); }
