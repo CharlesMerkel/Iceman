@@ -10,11 +10,11 @@ Actor::Actor(int imageID, int startX, int startY, Direction dir, double size, un
     setVisible(true);
 }
 
+ActorType Actor::getType() const { return ActorType::Unknown; } // Default implementation, can be overridden
+
 // --- HasHP ---
 HasHP::HasHP(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world, int initialHealth)
-    : Actor(imageID, startX, startY, dir, size, depth, world), _health(initialHealth)
-{
-}
+    : Actor(imageID, startX, startY, dir, size, depth, world), _health(initialHealth) { }
 
 // Decrease health by 1
 void HasHP::decreaseHealth()
@@ -27,16 +27,10 @@ void HasHP::decreaseHealth()
 }
 
 // Set the health explicitly
-void HasHP::setHealth(int health)
-{
-    _health = health;
-}
+void HasHP::setHealth(int health) { _health = health; }
 
 // Check if still alive
-bool HasHP::isAlive() const
-{
-    return _health > 0;
-}
+bool HasHP::isAlive() const { return _health > 0; }
 
 // --- Iceman ---
 Iceman::Iceman(StudentWorld* world)
@@ -106,7 +100,12 @@ bool Iceman::canTakeDamage() const
     {
         return false; // Iceman is stunned, cannot take damage
 	}
+	return true; // Iceman can take damage
 }
+
+bool Iceman::isStunned() const { return _isStunned; }
+
+void Iceman::setStunned(bool stunned) { _isStunned = stunned; }
 
 // --- Protestor --
 Protester::Protester(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world)
@@ -211,11 +210,13 @@ void Boulder::doSomething() {
     /* Implement Boulder behavior here */
     if (!isAlive()) { return; }
 
-    if (_bState == 0) {
-        if (!getWorld()->is_Ice(getX(), getY() - 1, down) {
+    if (_bState == 0) 
+    {
+        if (!getWorld()->is_Ice(getX(), getY(), GraphObject::down)) 
+        {
             _bState = 1;
             tick = 0;
-       }
+        }
     }
 
     else if (_bState == 1 && tick < 30) { tick++; }
@@ -246,7 +247,7 @@ Squirt::Squirt(int startX, int startY, Direction dir, StudentWorld* world)
 
 void Squirt::doSomething() { 
     /* Implement Squirt behavior here */
-    if (getWorld()->Protester_Annoyed) { setDead; }
+    if (getWorld()->Protester_Annoyed()) { setDead; }
     if (_sDistance == 4) { setDead; }
 
     else if (getDirection() == up) {
@@ -341,7 +342,7 @@ void Gold::doSomething() {
         getWorld()->Iceman_ptr->goldAmmoIncrease();
     }
 
-    else if (!isPickable()) {
+    else if (!isPickedUp()) {
         Actor* actor = getWorld()->Find_Protester(getX(), getY());
 
         if (actor == nullptr) {
@@ -377,7 +378,7 @@ void Sonar::doSomething() {
     reduceTick();
 }
 
-WaterPool::WaterPool(StudentWorld* world)
+WaterPool::WaterPool(int startX, int startY, StudentWorld* world)
     : PickUp(IID_WATER_POOL, startX, startY, right, 1.0, 2, world) {
     setVisible(true);
     setPickup(true);

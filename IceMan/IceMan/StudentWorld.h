@@ -39,7 +39,7 @@ public:
 	bool Can_Face();
 	bool Can_Add_Protester();
 	bool Can_Add_Waterpool(int x, int y);
-	void Find_Protester(int x, int y, vector<Actor*>& foundProtesters);
+	void Find_Protester(int x, int y, std::vector<Actor*>& foundProtesters);
 	void Remove_Dead_Game_Objects();
 	void Pickup_Oil();
 	void New_Direction();
@@ -55,23 +55,24 @@ public:
 
 	bool Finished_Level();
 	bool Player_Died();
+	bool isPlayerStunned() const;
 
 	//  --- Gameplay & Interactions ---
-	///
-	/// [ None of these inteactions work ]
-	///
+	// [ None of these inteactions work ]
 
 	Iceman* Iceman_ptr() { return _iceman; }
 
 	bool Near_Iceman(int x, int y, int actortype);
 	void Boulder_Annoyed(int x, int y);
-	bool Protester_Annoyed(int x, int y, int dmg);
+	bool Protester_Annoyed(int x, int y,int dmg);
 	bool Set_Position(int x, int y, char actortype);
 
 	// --- Other/Misc functions ---
 	void SpawnIce();
 	bool removeIceAt(int x, int y);
 	int getRestTime() const;
+
+
 private:
 	static const int _NUMIce = 3600;
 	std::vector<Ice*> _ptrIce;

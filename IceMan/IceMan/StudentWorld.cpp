@@ -13,10 +13,9 @@ GameWorld* createStudentWorld(string assetDir)
 	return new StudentWorld(assetDir);
 }
 
-// Add StudentWorld's:
-//  - Display & Cleanup:
-// 
-// Update_Display_Text - Updates the display with the current statistics. 
+//  --- Display & Cleanup ---
+
+// Update_Display_Text - Updates the display with the current statistics.
 // No_Overlap - Checks if an actor can be placed in the map without being overlapped with
 //              other actors/objects.
 
@@ -87,13 +86,23 @@ bool StudentWorld::Can_Add_Waterpool(int x, int y)
 // Find_Protester - Searches and returns a protester within a 3x3 area around a point.
 void StudentWorld::Find_Protester(int x, int y, vector<Actor*>& foundProtesters)
 {
-	//for (Actor* actor : _actors) 
-	//{
-	//	if (actor->isProtester() && abs(actor->getX() - x) <= 3 && abs(actor->getY() - y) <= 3) 
-	//	{
-	//		foundProtesters.push_back(actor);
-	//	}
-	//}
+	for (Actor* actor : _actors) 
+	{
+		ActorType type = actor->getType();
+		if ((type == ActorType::RegularProtester || type == ActorType::HardcoreProtester) && abs(actor->getX() - x) <= 3 && abs(actor->getY() - y) <= 3) 
+		{
+			foundProtesters.push_back(actor);
+		}
+	}
+}
+
+bool StudentWorld::isPlayerStunned() const
+{
+	if (_iceman)
+	{
+		return _iceman->isStunned(); // Check if the Iceman is stunned
+	}
+	return false; // If Iceman is not initialized, return false
 }
 
 // Remove_Dead_Game_Objects - Removes all dead actors & updates the actor's position.
@@ -118,26 +127,27 @@ void StudentWorld::Remove_Dead_Game_Objects()
 // Finished_Level - Returns true if the player picked up all the oil.
 bool StudentWorld::Finished_Level()
 {
-	//// Check if all oil barrels have been picked up
-	//for (Actor* actor : _actors) 
-	//{
-	//	if (actor->isOilBarrel() && !actor->isPickedUp()) 
-	//	{
-	//		return false; // Not all oil barrels have been picked up
-	//	}
-	//}
+	// Check if all oil barrels have been picked up
+	for (Actor* actor : _actors) 
+	{
+		if (actor->getType() == ActorType::OilBarrel && !actor->isPickedUp())
+		{
+			return false; // Not all oil barrels have been picked up
+		}
+	}
 	return true; // All oil barrels have been picked up
 }
 
 // Player_Died - Checks if the player died, if so, then decrement lives and returns true.
 bool StudentWorld::Player_Died()
 {
-	//if(_iceman._health <= 0) // Check if the Iceman's health is zero or less
-	//{
-	//	// Decrement lives and return true to indicate player death
-	//	_iceman->decrementLives();
-	//	return true;
-	//}
+	if(!_iceman->isAlive()) // Check if the Iceman's health is zero or less
+	{
+		// Decrement lives and return true to indicate player death
+		_iceman->loseLife();
+		return true;
+	}
+	return false; // Player is still alive
 }
 
 // New_Direction - Generates a random direction for an actor to move, as long as it's not blocked.
@@ -271,11 +281,8 @@ int StudentWorld::getRestTime() const
 	return std::max(0, static_cast<int>(3 - getLevel() / 4));
 }
 
-//  - Gameplay & Interactions - [ None of these inteactions work ]
-
-///
-/// [ None of these inteactions work ]
-/// 
+//  --- Gameplay & Interactions ---
+// [ None of these inteactions work ]
 
 // Near_Iceman - Checks if the Iceman is within a certain distance from a given coordinate.
 bool StudentWorld::Near_Iceman(int x, int y, int actortype) {
@@ -298,7 +305,9 @@ void StudentWorld::Boulder_Annoyed(int x, int y)
 bool StudentWorld::Protester_Annoyed(int x, int y, int dmg)
 {
 // Input Protester Damage 
+	return false; // Placeholder implementation, should be replaced with actual logic
 }
+
 // Set_Position - Sets a 4x4 actor in a specified coordinate.
 void StudentWorld::Set_Position(int x, int y, char actortype)
 {

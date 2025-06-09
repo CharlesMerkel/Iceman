@@ -14,6 +14,21 @@
 
 class StudentWorld;  // Forward declaration
 
+enum class ActorType
+{
+    Iceman,
+    Ice,
+    Boulder,
+    OilBarrel,
+    Gold,
+    Sonar,
+    WaterPool,
+	RegularProtester,
+	HardcoreProtester,
+	Squirt,
+	Unknown //placeholder for unknown actor types
+};
+
 // --- Base Actor Class ---
 class Actor : public GraphObject
 {
@@ -25,6 +40,9 @@ public:
     virtual void setDead() { _swAlive = false; }
 
     virtual void doSomething() = 0;
+
+    virtual ActorType getType() const;
+    virtual bool isPickedUp() const { return false; } // default for non-pickups
 
 protected:
     StudentWorld* getWorld() const { return _world; }
@@ -40,6 +58,7 @@ class Ice : public Actor
 public:
     Ice(int startX, int startY, StudentWorld* world);
 	~Ice() override;
+    virtual ActorType getType() const override { return ActorType::Ice; }
     virtual void doSomething() override;
 };
 
@@ -47,6 +66,7 @@ class Boulder : public Actor
 {
 public:
     Boulder(int startX, int startY, StudentWorld* world);
+    virtual ActorType getType() const override { return ActorType::Boulder; }
     virtual void doSomething() override;
 
 private:
@@ -58,6 +78,7 @@ class Squirt : public Actor
 {
 public:
     Squirt(int startX, int startY, Direction dir, StudentWorld* world);
+    virtual ActorType getType() const override { return ActorType::Squirt; }
     virtual void doSomething() override;
 
 private:
@@ -95,10 +116,14 @@ public:
     int getScore() const;
     void loseLife();
     bool canTakeDamage() const;
+    bool isStunned() const;
+	void setStunned(bool stunned = true) { _canTakeDamage = !stunned; }
+    virtual ActorType getType() const override { return ActorType::Iceman; }
 
 private:
     int _oilCount, _waterAmmo, _sonarAmmo, _goldAmmo, _playerScore, _lives;
     bool _canTakeDamage = true;
+	bool _isStunned = false;
 };
 
 // --- Protester Base Class ---
@@ -135,7 +160,7 @@ public:
     {
         // Customize starting position or behavior as needed
     }
-
+    virtual ActorType getType() const override { return ActorType::RegularProtester; }
     virtual void doSomething() override;
     virtual void die() override;
 };
@@ -149,7 +174,7 @@ public:
     {
         // Customize starting position or behavior as needed
     }
-
+    virtual ActorType getType() const override { return ActorType::HardcoreProtester; }
     virtual void doSomething() override;
     virtual void die() override;
 };
@@ -170,13 +195,13 @@ public:
 
     void setPickup(bool exists) { _pickUpExists = exists; }
 
-    bool isPickable() { return _pickUpExists; }
+    virtual bool isPickedUp() const override { return !_pickUpExists; }
 
-    int getTick() { return tickSpan; }
+    int getTick() { return _tickSpan; }
 
-    void reduceTick() { tickSpan--; }
+    void reduceTick() { _tickSpan--; }
 
-    void setTick(int amt) { tickSpan = amt; }
+    void setTick(int amt) { _tickSpan = amt; }
 
 protected:
     void showPickup();
@@ -194,6 +219,7 @@ class Oil : public PickUp
 {
 public:
     Oil(int startX, int startY, StudentWorld* world);
+    virtual ActorType getType() const override { return ActorType::OilBarrel; }
     virtual void doSomething() override;
 };
 
@@ -201,6 +227,7 @@ class Gold : public PickUp
 {
 public:
     Gold(int startX, int startY, StudentWorld* world);
+    virtual ActorType getType() const override { return ActorType::Gold; }
     virtual void doSomething() override;
 };
 
@@ -208,6 +235,7 @@ class Sonar : public PickUp
 {
 public:
     Sonar(StudentWorld* world);
+    virtual ActorType getType() const override { return ActorType::Sonar; }
     virtual void doSomething() override;
 };
 
@@ -215,6 +243,7 @@ class WaterPool : public PickUp
 {
 public:
     WaterPool(int startX, int startY, StudentWorld* world);
+    virtual ActorType getType() const override { return ActorType::WaterPool; }
     virtual void doSomething() override;
 };
 
