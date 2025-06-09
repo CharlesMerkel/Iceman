@@ -215,13 +215,13 @@ void Boulder::doSomething() {
         if (!getWorld()->is_Ice(getX(), getY(), GraphObject::down)) 
         {
             _bState = 1;
-            tick = 0;
+            _tick = 0;
         }
     }
 
-    else if (_bState == 1 && tick < 30) { tick++; }
+    else if (_bState == 1 && _tick < 30) { _tick++; }
 
-    else if (_bState == 1 && tick == 30) {
+    else if (_bState == 1 && _tick == 30) {
         _bState = 2;
         // start playing sfx
     }
@@ -233,7 +233,7 @@ void Boulder::doSomething() {
             // Needs both Boulder_Annoyed & Protester_Annoyed to function
             getWorld()->Set_Position(getX(), getY(), 'B');
         }
-        else if (!getWorld()->Can_Fall(getX(), getY() - 1)) { IsDead(); }
+        else if (!getWorld()->Can_Fall(getX(), getY() - 1)) { setDead(); }
     }
 }
 
@@ -339,12 +339,12 @@ void Gold::doSomething() {
         setDead();
         //play sfx
         //insert function for increasing score
-        getWorld()->Iceman_ptr->goldAmmoIncrease();
+        getWorld()->Iceman_ptr()->goldAmmoIncrease();
     }
 
     else if (!isPickedUp()) {
-        Actor* actor = getWorld()->Find_Protester(getX(), getY());
-
+        Actor* actor = getWorld()->Find_Protester(getX(), getY(), //vector of actors);
+            );
         if (actor == nullptr) {
             if (getTick() == 0) { setDead(); }
 
