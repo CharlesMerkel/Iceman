@@ -1,5 +1,4 @@
 ﻿  Actor.cpp
   StudentWorld.cpp
   Generating Code...
-StudentWorld.obj : error LNK2019: unresolved external symbol "public: void __thiscall Iceman::loseLife(void)" (?loseLife@Iceman@@QAEXXZ) referenced in function "public: bool __thiscall StudentWorld::Player_Died(void)" (?Player_Died@StudentWorld@@QAE_NXZ)
-C:\Users\josch\source\repos\Iceman\IceMan\Debug\IceMan.exe : fatal error LNK1120: 1 unresolved externals
+  IceMan.vcxproj -> C:\Users\charl\source\repos\Iceman\IceMan\Debug\IceMan.exe

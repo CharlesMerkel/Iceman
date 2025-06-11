@@ -104,7 +104,10 @@ bool Iceman::canTakeDamage() const
 }
 
 bool Iceman::isStunned() const { return _isStunned; }
-
+void Iceman::loseLife()
+{
+    getWorld()->decLives();
+}
 //void Iceman::setStunned(bool stunned) { _isStunned = stunned; } This was already defined in Actor.h
 void setStunned(bool stunned){}
 
