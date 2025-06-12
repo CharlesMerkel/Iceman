@@ -16,6 +16,31 @@ GameWorld* createStudentWorld(string assetDir)
 //  --- Display & Cleanup ---
 
 // Update_Display_Text - Updates the display with the current statistics.
+void StudentWorld::Update_Display_Text()
+{
+	int level = getLevel();
+	int lives = getLives();
+	int health = _iceman->getHealth(); // returns 0-10; multiply by 10 for percent
+	int water_count = _iceman->getWaterAmmo();
+	int gold = _iceman->getGoldAmmo();
+	int barrelsLeft = 1; // getBarrelsLeft(); // not yet implemented, but should return the number of oil barrels left in the level
+	int sonar = _iceman->getSonarAmmo();
+	int score = getScore();
+
+	// Formatting the string for display
+	ostringstream oss;
+	oss << "Lvl: " << setw(2) << level
+		<< "  Lives: " << setw(1) << lives
+		<< "  Hlth: " << setw(3) << (health * 10) << "%"
+		<< "  Wtr: " << setw(2) << water_count
+		<< "  Gld: " << setw(2) << gold
+		<< "  Oil Left: " << setw(2) << barrelsLeft
+		<< "  Sonar: " << setw(2) << sonar
+		<< "  Scr: " << setw(6) << setfill('0') << score;
+
+	// Display on top of screen
+	setGameStatText(oss.str());
+}
 // No_Overlap - Checks if an actor can be placed in the map without being overlapped with
 //              other actors/objects.
 
@@ -37,6 +62,7 @@ int StudentWorld::init() {
 //        probablity of spawning hardcore protesters, spawns most of the Pickups & finally 
 //        checks if the level is completed or if the player died to start the next map.
 int StudentWorld::move() {
+	Update_Display_Text();
 	if(_iceman)
 	_iceman->doSomething(); //let the iceman act this tick
 

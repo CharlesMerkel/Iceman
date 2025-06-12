@@ -40,6 +40,9 @@ public:
 	virtual int move() override;
 	virtual void cleanUp() override;
 
+	// --- Display ---
+	void Update_Display_Text();
+
 	//  --- Actor Management ---
 	bool Can_Face();
 	bool Can_Add_Protester();

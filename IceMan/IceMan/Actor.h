@@ -110,19 +110,35 @@ public:
     virtual void doSomething() override;
     virtual void die() override;
 
+	//amount increase functions
     void sonarAmmoIncrease() { _sonarAmmo++; }
     void goldAmmoIncrease() { _goldAmmo++; }
     void waterAmmoIncrease() { _waterAmmo += 5; }
     void oilGet();
+
+    //score and life
     int getScore() const;
     void loseLife();
+
+	//damage and stun handling
     bool canTakeDamage() const;
     bool isStunned() const;
 	void setStunned(bool stunned = true) { _canTakeDamage = !stunned; }
+
+    //type setting
     virtual ActorType getType() const override { return ActorType::Iceman; }
+
+    //getters for display text
+	int getHealth() const { return _health; }
+	int getWaterAmmo() const { return _waterAmmo; }
+	int getGoldAmmo() const { return _goldAmmo; }
+	int getSonarAmmo() const { return _sonarAmmo; }
+	int getOilCount() const { return _oilCount; }
+	int getLives() const { return _lives; }
 
 private:
     int _oilCount, _waterAmmo, _sonarAmmo, _goldAmmo, _playerScore, _lives;
+
     bool _canTakeDamage = true;
 	bool _isStunned = false;
 };
