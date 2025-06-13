@@ -79,7 +79,7 @@ int StudentWorld::init() {
 	_actors.push_back(new RegularProtester(this));
 
 
-	//creates barrels
+	// Creates barrels
 	_nBarrels = min<unsigned int>(2 + getLevel(), 21);
 
 	for (int j = 0; j < _nBarrels; j++){
@@ -434,7 +434,7 @@ void StudentWorld::Squirt_Water(int x, int y, GraphObject::Direction dir){
 }
 // Sonar_Used - Makes all actors within a 12 unit radius from the player visible.
 void StudentWorld::Sonar_Used(int x, int y) {
-	const int range = 144; // 12 * 12
+	const int range = 144;
 
 	for (Actor* actor : _actors) {
 		int dx = actor->getX() - x;
