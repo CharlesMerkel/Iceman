@@ -162,6 +162,7 @@ public:
     void setRestingTime(int time) { _restingTime = time; }
     int getRestingTime() const { return _restingTime; }
 
+    virtual bool is_Protester(){ return true; }
 protected:
     bool _leavingField = false;
     bool _stunned = false;

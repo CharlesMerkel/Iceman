@@ -36,6 +36,7 @@ public:
 
 	~StudentWorld(); // Destructor to clean up memory
 
+	bool No_Overlap(int x, int y);
 	virtual int init() override;
 	virtual int move() override;
 	virtual void cleanUp() override;
@@ -44,7 +45,7 @@ public:
 	void Update_Display_Text();
 
 	//  --- Actor Management ---
-	bool Can_Face();
+	bool Can_Face(int x, int y, GraphObject::Direction& dir);
 	bool Can_Add_Protester();
 	bool Can_Add_Waterpool(int x, int y);
 	void Find_Protester(int x, int y, std::vector<Actor*>& foundProtesters);
@@ -74,6 +75,9 @@ public:
 	void Boulder_Annoyed(int x, int y);
 	bool Protester_Annoyed(int x, int y,int dmg);
 	bool Set_Position(int x, int y, char actortype);
+	char Get_Position(int x, int y) const { return _actorPositions[x][y]; }
+	void Squirt_Water(int x, int y, GraphObject::Direction dir);
+	void Sonar_Used(int x, int y);
 
 	// --- Other/Misc functions ---
 	void SpawnIce();
@@ -85,6 +89,11 @@ private:
 	static const int _NUMIce = 3600;
 	std::vector<Ice*> _ptrIce;
 	Iceman* _iceman;
+	int _nBarrels = 0;
+	int _pickedBarrels;
+	int _ticksForProtester;
+	int _t_LastProtester;
+	int _nProtesters = 0;
 
 	char _actorPositions[64][64] = {};
 	std::list<Actor*> _actors; // List of actors in the game world
