@@ -206,7 +206,7 @@ class PickUp : public Actor
 {
 public:
     PickUp(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world);
-    virtual void doSomething() override;
+    //virtual void doSomething() override;
 
     //recommended v const
     bool isVisible() const { return _pickVisible; }
