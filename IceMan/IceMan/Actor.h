@@ -250,7 +250,7 @@ public:
 class Gold : public PickUp
 {
 public:
-    Gold(int startX, int startY, StudentWorld* world);
+    Gold(int startX, int startY, StudentWorld* world, bool isVisible, bool exists);
     virtual ActorType getType() const override { return ActorType::Gold; }
     virtual void doSomething() override;
 };

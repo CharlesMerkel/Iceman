@@ -83,7 +83,7 @@ void Iceman::doSomething()
     {
         for (int dy = 0; dy < 4; ++dy)
         {
-            getWorld()->removeIceAt(icemanX + dx, icemanY + dy);
+            getWorld()->Remove_Ice_At(icemanX + dx, icemanY + dy);
         }
     }
 }
@@ -343,7 +343,7 @@ void Oil::doSomething() {
 
 }
 
-Gold::Gold(int startX, int startY, StudentWorld* world)
+Gold::Gold(int startX, int startY, StudentWorld* world, bool isVisible, bool canpick)
     : PickUp(IID_GOLD, startX, startY, right, 1.0, 2, world) {
     setVisible(true);
     setPickup(true);

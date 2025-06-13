@@ -24,7 +24,7 @@ void StudentWorld::Update_Display_Text()
 	int health = _iceman->getHealth(); // returns 0-10; multiply by 10 for percent
 	int water_count = _iceman->getWaterAmmo();
 	int gold = _iceman->getGoldAmmo();
-	int barrelsLeft = _nBarrels - _pickedBarrels;
+	int barrelsLeft = _Barrels - _pickedBarrels;
 	int sonar = _iceman->getSonarAmmo();
 	int score = getScore();
 
@@ -72,26 +72,65 @@ int StudentWorld::init() {
 	_pickedBarrels = 0;
 	_nProtesters = 0;
 
+	// Set boundary
+	for (int x = 30; x != 34; x++) {
+		for (int y = 4; y != 60; y++) {
+			_actorPositions[x][y] = 't';
+		}
+	}
+
+	// Spawn Iceman
 	_iceman = new Iceman(this);
 
+	// Spawn Oil Barrels (?)
+	_Barrels = min<unsigned int>(2 + getLevel(), 21);
+
+	for (int j = 0; j < _Barrels; j++) {
+		int x = rand() % 61;
+		int y = rand() % 57;
+
+		if (No_Overlap(x, y)) {
+			_actors.push_back(new Oil(x, y, this));
+			Set_Position(x, y, 'O');
+		}
+
+		else { j--; }
+	}
+
+	// Spawn Boulder (?)
+	for (int i = 0; i < _Boulders; i++){
+		int x = rand() % 61;
+		int y = rand() % 37 + 20;
+
+		if (No_Overlap(x, y)){
+			_actors.push_back(new Boulder(x, y, this));
+			Remove_Ice_At(x, y);
+			Set_Position(x, y, 'B');
+		}
+
+		else { i--; }
+	}
+
+	// Spawn Gold (?)
+	_Gold = max<unsigned int>(5 - getLevel() / 2, 2);
+
+	for (int i = 0; i < _Gold; i++){
+		int x = rand() % 61;
+		int y = rand() % 57;
+
+		if (No_Overlap(x, y)){
+			_actors.push_back(new Gold(x, y, this, false, true));
+			Set_Position(x, y, 'G');
+		}
+
+		else { i--; }
+	}
 
 	// Spawn a RegularProtester
 	_actors.push_back(new RegularProtester(this));
 
 
-	// Creates barrels
-	_nBarrels = min<unsigned int>(2 + getLevel(), 21);
 
-	for (int j = 0; j < _nBarrels; j++){
-		int x = rand() % 61;
-		int y = rand() % 57;
-
-		if (No_Overlap(x, y)){
-			_actors.push_back(new Oil(x, y, this));
-			Set_Position(x, y, 'O');
-		}
-		else{ j--; }
-	}
 	return GWSTATUS_CONTINUE_GAME;
 }
 
@@ -100,9 +139,59 @@ int StudentWorld::init() {
 //        checks if the level is completed or if the player died to start the next map.
 int StudentWorld::move() {
 	Update_Display_Text();
+
 	if(_iceman)
 	_iceman->doSomething(); //let the iceman act this tick
 
+
+	// Power Up Spawning
+
+	int dropChance = getLevel() * 25 + 300;
+	int n = rand() % dropChance + 1;
+
+	if (n <= 1)
+	{
+		int chance = rand() % 5 + 1;
+
+		if (chance <= 1)
+		{ _actors.push_back(new Sonar(this)); }
+
+		else if (chance > 1){
+			int x = rand() % 61;
+			int y = rand() % 61;
+
+			while (!Can_Add_Waterpool(x, y)){
+				x = rand() % 61;
+				y = rand() % 61;
+			}
+
+			_actors.push_back(new WaterPool(x, y, this));
+		}
+	}
+
+	// doSomething function calls (REALLY doesn't work.)
+
+	/*
+	if (_iceman->isAlive()) { _iceman->doSomething(); }
+
+	std::vector<Actor*>::iterator it;
+
+	for (auto it = _actors.begin(); it != _actors.end(); it++){
+		if ((*it)->isAlive()) { (*it)->doSomething(); }
+
+		// Win/Lose conditions
+		// if (Player_Died()) { return GWSTATUS_PLAYER_DIED; }
+
+	  	// if (Finished_Level()) { return GWSTATUS_FINISHED_LEVEL; }
+	    
+	} */
+
+	Remove_Dead_Game_Objects();
+
+	// Win/Lose conditions (Again, just in case an actor doesn't call their doSomethings)
+	// if (Player_Died()) { return GWSTATUS_PLAYER_DIED; }
+
+	// if (Finished_Level()) { return GWSTATUS_FINISHED_LEVEL; }
 	return GWSTATUS_CONTINUE_GAME;
 }
 
@@ -493,8 +582,8 @@ void StudentWorld::SpawnIce()
 	}
 }
 
-// Remove_Ice - Attempts to remove ice from the grid at the specified coordinates. If successful, it returns true.
-bool StudentWorld::removeIceAt(int x, int y)
+// Remove_Ice_At - Attempts to remove ice from the grid at the specified coordinates. If successful, it returns true.
+bool StudentWorld::Remove_Ice_At(int x, int y)
 {
 	for (size_t i = 0; i < _ptrIce.size(); ++i)
 	{

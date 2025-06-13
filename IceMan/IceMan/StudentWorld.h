@@ -83,7 +83,7 @@ public:
 
 	// --- Other/Misc functions ---
 	void SpawnIce();
-	bool removeIceAt(int x, int y);
+	bool Remove_Ice_At(int x, int y);
 	int getRestTime() const;
 
 
@@ -91,8 +91,10 @@ private:
 	static const int _NUMIce = 3600;
 	std::vector<Ice*> _ptrIce;
 	Iceman* _iceman;
-	int _nBarrels = 0;
-	int _pickedBarrels;
+	int _Barrels = 0;
+	int _pickedBarrels = 0;
+	int _Boulders;
+	int _Gold;
 	int _ticksForProtester;
 	int _t_LastProtester;
 	int _nProtesters = 0;
