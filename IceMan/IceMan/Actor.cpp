@@ -247,7 +247,7 @@ void Boulder::doSomething() {
         if (getWorld()->Can_Fall(getX(), getY() - 1)) {
             getWorld()->Set_Position(getX(), getY(), 0);
             moveTo(getX(), getY() - 1);
-            // Needs both Boulder_Annoyed & Protester_Annoyed to function
+            getWorld()->Boulder_Annoyed(getX(), getY());
             getWorld()->Set_Position(getX(), getY(), 'B');
         }
         else if (!getWorld()->Can_Fall(getX(), getY() - 1)) { setDead(); }
@@ -309,14 +309,16 @@ PickUp::PickUp(int imageID, int startX, int startY, Direction dir, double size, 
     : Actor(imageID, startX, startY, dir, size, depth, world)
 {
     setVisible(true);
+    _tickSpan = max<unsigned int>(100, 300 - 10 * (getWorld()->getLevel()));
 }
 
+/* PickUp doesn't need a doSomething()
 void PickUp::doSomething()
 {
     // Placeholder logic for PickUp actions
     // This can be customized to check collisions, player interactions, etc.
 }
-
+*/
 // --- Pickups (Oil, Gold, Sonar, WaterPool) ---
 Oil::Oil(int startX, int startY, StudentWorld* world)
     : PickUp(IID_BARREL, startX, startY, right, 1.0, 2, world) {
@@ -335,7 +337,7 @@ void Oil::doSomething() {
     else if (getWorld()->Near_Iceman(getX(), getY(), 3)) {
         setDead();
         //play sfx
-        //insert function for increasing score
+        getWorld()->increaseScore(1000);
         getWorld()->Pickup_Oil(getX(), getY());
     }
 
@@ -355,13 +357,12 @@ void Gold::doSomething() {
     if (!isVisible() && getWorld()->Near_Iceman(getX(), getY(), 3)) {
         setDead();
         //play sfx
-        //insert function for increasing score
+        getWorld()->increaseScore(10);
         getWorld()->Iceman_ptr()->goldAmmoIncrease();
     }
 
     else if (!isPickedUp()) {
         std::vector<Actor*> protesters;
-        getWorld()->Find_Protester(getX(), getY(), protesters);
         if (!protesters.empty()) {
             if (getTick() == 0) { setDead(); }
 
@@ -369,7 +370,7 @@ void Gold::doSomething() {
         }
         else {
             setDead();
-            //Bribe the actor
+            // bribe the actor
         }
     }
 }
@@ -387,7 +388,7 @@ void Sonar::doSomething() {
     if (getWorld()->Near_Iceman(getX(), getY(), 3)) {
         setDead();
         //play sfx
-        //increase score
+        getWorld()->increaseScore(75);
         getWorld()->Iceman_ptr()->sonarAmmoIncrease();
     }
 
@@ -408,7 +409,7 @@ void WaterPool::doSomething() {
     if (getWorld()->Near_Iceman(getX(), getY(), 3)) {
         setDead();
         //play sfx
-        //increase score
+        getWorld()->increaseScore(100);
         getWorld()->Iceman_ptr()->waterAmmoIncrease();
     }
 

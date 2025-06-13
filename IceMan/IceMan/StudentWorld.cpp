@@ -1,5 +1,6 @@
 #include "StudentWorld.h"
 #include "Actor.h"
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -23,7 +24,7 @@ void StudentWorld::Update_Display_Text()
 	int health = _iceman->getHealth(); // returns 0-10; multiply by 10 for percent
 	int water_count = _iceman->getWaterAmmo();
 	int gold = _iceman->getGoldAmmo();
-	int barrelsLeft = 1; // getBarrelsLeft(); // not yet implemented, but should return the number of oil barrels left in the level
+	int barrelsLeft = _nBarrels - _pickedBarrels;
 	int sonar = _iceman->getSonarAmmo();
 	int score = getScore();
 
@@ -43,18 +44,54 @@ void StudentWorld::Update_Display_Text()
 }
 // No_Overlap - Checks if an actor can be placed in the map without being overlapped with
 //              other actors/objects.
+bool StudentWorld::No_Overlap(int x, int y) {
+	const int maxSqrt = 36; 
+
+	for (const auto* actor : _actors) {
+		int dx = actor->getX() - x;
+		int dy = actor->getY() - y;
+		if (dx * dx + dy * dy <= maxSqrt)
+			return false;
+	}
+
+	if (Get_Position(x, y) != 0 ||
+		Get_Position(x + 3, y) != 0 ||
+		Get_Position(x, y + 3) != 0 ||
+		Get_Position(x + 3, y + 3) != 0)
+		return false;
+
+	return true;
+}
 
 // Init - Initializes the game world: ice, boulders, gold, oil, the Iceman thenmself.
 //        and also determines the number of actors based off of the current level.
 int StudentWorld::init() {
 
 	SpawnIce();
+	_ticksForProtester = _t_LastProtester = max<unsigned int>(25, 200 - getLevel());
+	_pickedBarrels = 0;
+	_nProtesters = 0;
+
 	_iceman = new Iceman(this);
 
 
 	// Spawn a RegularProtester
 	_actors.push_back(new RegularProtester(this));
 
+
+	// Creates barrels
+	_nBarrels = min<unsigned int>(2 + getLevel(), 21);
+
+	for (int j = 0; j < _nBarrels; j++){
+		int x = rand() % 61;
+		int y = rand() % 57;
+
+		if (No_Overlap(x, y)){
+			_actors.push_back(new Oil(x, y, this));
+			Set_Position(x, y, 'O');
+		}
+		else{ j--; }
+	}
 	return GWSTATUS_CONTINUE_GAME;
 }
 
@@ -90,26 +127,77 @@ void StudentWorld::cleanUp() {
 
 //  --- Actor Management --
  
-//Checks if the Actor can face the Iceman based off of its coordinates &
+// Can_Face - Checks if the Actor can face the Iceman based off of its coordinates &
 //current direction, returns false if unable.
-bool StudentWorld::Can_Face()
-{
-	return false; // Placeholder implementation, should be replaced with actual logic
-}        
+bool StudentWorld::Can_Face(int x, int y, GraphObject::Direction& dir){
+		bool rv = false;
+
+		if (x >= _iceman->getX() - 63 && x < _iceman->getX() - 4 && y < _iceman->getY() + 4 && y > _iceman->getY() - 4 && !Near_Iceman(x, y, 4)){
+			rv = true;
+			dir = GraphObject::right;
+
+			for (int i = x; i != _iceman->getX(); i++) {
+				if (!No_Ice_Or_Boulder(i, y, GraphObject::right)) { rv = false; }
+			}
+		}
+
+		else if (x <= _iceman->getX() + 63 && x > _iceman->getX() + 4 && y < _iceman->getY() + 4 && y > _iceman->getY() - 4 && !Near_Iceman(x, y, 4)){
+			rv = true;
+			dir = GraphObject::left;
+
+			for (int i = x; i != _iceman->getX(); i--) {
+				if (!No_Ice_Or_Boulder(i, y, GraphObject::left)) { rv = false; }
+			}
+		}
+
+		else if (y >= _iceman->getY() - 63 && y < _iceman->getY() - 4 && x < _iceman->getX() + 4 && x > _iceman->getX() - 4 && !Near_Iceman(x, y, 4)){
+			rv = true;
+			dir = GraphObject::up;
+
+			for (int i = y; i != _iceman->getY(); i++) {
+				if (!No_Ice_Or_Boulder(x, i, GraphObject::up)) { rv = false; }
+			}
+		}
+
+		else if (y <= _iceman->getY() + 63 && y > _iceman->getY() + 4 && x < _iceman->getX() + 4 && x > _iceman->getX() - 4 && !Near_Iceman(x, y, 4)){
+			rv = true;
+			dir = GraphObject::down;
+
+			for (int i = y; i != _iceman->getY(); i--) {
+				if (!No_Ice_Or_Boulder(x, i, GraphObject::down)) { rv = false; }
+			}
+		}
+
+		return rv;
+	}
 
 // Checks if a new protester can spawn based off of the level and tick.
-bool StudentWorld::Can_Add_Protester()
-{
-	return true; // Placeholder implementation, should be replaced with actual logic
+bool StudentWorld::Can_Add_Protester(){
+    int maxProtesters = std::min<unsigned int>(15, 2 + getLevel() * 1.5);
+
+	if (_t_LastProtester >= _ticksForProtester && _nProtesters < maxProtesters) {
+		_t_LastProtester = 0;
+		_nProtesters++;
+		return true;
+	}
+
+	_t_LastProtester++;
+	return false;
 }
 
 // Can_Add_Waterpool - Checks if a waterpool can be added at a coordinate, ensuring that ice isn't
 // blocking the area.
-bool StudentWorld::Can_Add_Waterpool(int x, int y)
-{
-	return true; // Placeholder implementation, should be replaced with actual logic
+bool StudentWorld::Can_Add_Waterpool(int x, int y) {
+	for (int i = 0; i != _NUMIce; i++) {
+		if (_ptrIce[i] != nullptr) {
+			if (_ptrIce[i]->getX() >= x && _ptrIce[i]->getX() <= x + 3 && _ptrIce[i]->getY() >= y && _ptrIce[i]->getY() <= y + 3)
+			{ return false; }
+		}
+	}
+	return true;
 }
-// Find_Protester - Searches and returns a protester within a 3x3 area around a point.
+
+//Find_Protester - Searches and returns a protester within a 3x3 area around a point.
 void StudentWorld::Find_Protester(int x, int y, vector<Actor*> & foundProtesters)
 {
 	for (Actor* actor : _actors) 
@@ -132,20 +220,19 @@ bool StudentWorld::isPlayerStunned() const
 }
 
 // Remove_Dead_Game_Objects - Removes all dead actors & updates the actor's position.
-void StudentWorld::Remove_Dead_Game_Objects()
-{
-	//for (auto it = _actors.begin(); it != _actors.end();) 
-	//{
-	//	if ((*it)->isDead()) 
-	//	{
-	//		delete *it; // Delete the dead actor
-	//		it = _actors.erase(it); // Remove from the vector
-	//	} 
-	//	else 
-	//	{
-	//		++it; // Move to the next actor
-	//	}
-	//}
+void StudentWorld::Remove_Dead_Game_Objects() {
+	for (auto it = _actors.begin(); it != _actors.end(); ) {
+		Actor* actor = *it;
+
+		if (!actor->isAlive()) {
+			Set_Position(actor->getX(), actor->getY(), 0);
+			if (dynamic_cast<Protester*>(actor) != nullptr) { --_nProtesters; }
+
+			delete actor;
+			it = _actors.erase(it); 
+		}
+		else { ++it; }
+	}
 }
 
 bool StudentWorld::inLineOfSightToPlayer(int x, int y, GraphObject::Direction& outDir) const
@@ -231,15 +318,8 @@ void StudentWorld::New_Direction()
 // Pickup_Oil - Marks an Oil barrel as being picked up and increments Oil Pickup counter.
 void StudentWorld::Pickup_Oil(int x, int y)
 {
-		//for (Actor* actor : _actors) 
-	//{
-	//	if (actor->isOilBarrel() && !actor->isPickedUp()) 
-	//	{
-	//		actor->setPickedUp(true); // Mark the oil barrel as picked up
-	//		incrementOilCount(); // Increment the oil count
-	//		return; // Exit after picking up one oil barrel
-	//	}
-	//}
+	Set_Position(x, y, 0);
+	_pickedBarrels++;
 }
 
 //  --- Collision & Movement Checks ---
@@ -249,25 +329,28 @@ bool StudentWorld::Is_Boulder(int x, int y, GraphObject::Direction dir) const
 {
 	// Calculate the adjacent tile based on direction
 	switch (dir) {
-	case GraphObject::left:  x -= 1; break;
-	case GraphObject::right: x += 1; break;
-	case GraphObject::up:    y += 1; break;
-	case GraphObject::down:  y -= 1; break;
-	default: break;
+	case GraphObject::right:
+		if (Get_Position(x + 3, y) == 'B' || Get_Position(x + 3, y + 3) == 'B')
+		{ return true; }
+		break;
+	case GraphObject::left:
+		if (Get_Position(x, y) == 'B' || Get_Position(x, y + 3) == 'B')
+		{ return true; }
+		break;
+	case GraphObject::up:
+		if (Get_Position(x, y + 3) == 'B' || Get_Position(x + 3, y + 3) == 'B')
+		{ return true; }
+		break;
+	case GraphObject::down:
+		if (Get_Position(x, y) == 'B' || Get_Position(x + 3, y) == 'B')
+		{ return true; }
+		break;
 	}
-
-	//// Now check if any actor at the new (x, y) is a Boulder
-	//for (Actor* actor : _actors) {
-	//	Boulder* b = dynamic_cast<Boulder*>(actor);
-	//	if (b && b->isAlive() && b->getX() == x && b->getY() == y) {
-	//		return true;
-	//	}
-	//}
 
 	return false;
 }
 
-// Is_Ice - Checks if there is ice at the given coordinates in a specified direction.
+//Is_Ice - Checks if there is ice at the given coordinates in a specified direction.
 bool StudentWorld::Is_Ice(int x, int y, GraphObject::Direction dir) const
 {
 	// Calculate the adjacent tile based on direction
@@ -287,7 +370,7 @@ bool StudentWorld::Is_Ice(int x, int y, GraphObject::Direction dir) const
 	return false; // No ice found
 }
 
-// No_Ice_Or_Boulder - Checks if there is neither ice nor a boulder in a specified direction from given coordinates.
+//No_Ice_Or_Boulder - Checks if there is neither ice nor a boulder in a specified direction from given coordinates.
 bool StudentWorld::No_Ice_Or_Boulder(int x, int y, GraphObject::Direction dir) const
 {
 	// Calculate the adjacent tile based on direction
@@ -365,7 +448,7 @@ bool StudentWorld::Protester_Annoyed(int x, int y, int dmg)
 // Set_Position - Sets a 4x4 actor in a specified coordinate.
 bool StudentWorld::Set_Position(int x, int y, char actortype)
 {
-	for (int row = x; row != x + 4; row++)
+	for (int row = x; row != x + 4; row++) 
 		for (int col = y; col != y + 4; col++)
 			_actorPositions[row][col] = actortype;
 
@@ -373,7 +456,24 @@ bool StudentWorld::Set_Position(int x, int y, char actortype)
 }
 
 // Squirt_Water - Creates a squirt object from the player
+void StudentWorld::Squirt_Water(int x, int y, GraphObject::Direction dir){
+	_actors.push_back(new Squirt(x, y, dir, this));
+    // play sfx
+}
 // Sonar_Used - Makes all actors within a 12 unit radius from the player visible.
+void StudentWorld::Sonar_Used(int x, int y) {
+	const int range = 144;
+
+	for (Actor* actor : _actors) {
+		int dx = actor->getX() - x;
+		int dy = actor->getY() - y;
+		int distSquared = dx * dx + dy * dy;
+
+		if (distSquared <= range) { actor->setVisible(true); }
+	}
+
+	// play sfx
+}
 
 //  - Misc Functions
 

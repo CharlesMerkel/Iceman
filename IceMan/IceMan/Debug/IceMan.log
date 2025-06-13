@@ -1,7 +1,10 @@
 ﻿  Actor.cpp
   StudentWorld.cpp
-  GameController.cpp
-  GameWorld.cpp
-  main.cpp
+C:\Users\josch\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(174,54): warning C4244: 'argument': conversion from 'double' to 'const _Ty', possible loss of data
+C:\Users\josch\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(174,54): warning C4244:         with
+C:\Users\josch\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(174,54): warning C4244:         [
+C:\Users\josch\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(174,54): warning C4244:             _Ty=unsigned int
+C:\Users\josch\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(174,54): warning C4244:         ]
   Generating Code...
-  IceMan.vcxproj -> C:\Users\charl\source\repos\Iceman\IceMan\Debug\IceMan.exe
+Actor.obj : error LNK2001: unresolved external symbol "public: virtual void __thiscall PickUp::doSomething(void)" (?doSomething@PickUp@@UAEXXZ)
+C:\Users\josch\source\repos\Iceman\IceMan\Debug\IceMan.exe : fatal error LNK1120: 1 unresolved externals
