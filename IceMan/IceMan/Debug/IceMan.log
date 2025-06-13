@@ -1,2 +1,7 @@
-﻿  StudentWorld.cpp
+﻿  Actor.cpp
+  StudentWorld.cpp
+  GameController.cpp
+  GameWorld.cpp
+  main.cpp
+  Generating Code...
   IceMan.vcxproj -> C:\Users\charl\source\repos\Iceman\IceMan\Debug\IceMan.exe

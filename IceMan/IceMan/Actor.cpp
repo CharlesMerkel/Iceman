@@ -118,12 +118,29 @@ Protester::Protester(int imageID, int startX, int startY, Direction dir, double 
     setVisible(true);
     _leavingField = false;
     _stunned = false;
-    _restingTime = 0;
+    _restingTime;
 }
 
 void Protester::doSomething()
 {
     if (!isAlive()) return;
+
+	reduceShoutCooldown(); // Reduce shout cooldown each tick
+
+	//stores the Iceman's position
+    int iceX = getWorld()->getIceman()->getX();
+    int iceY = getWorld()->getIceman()->getY();
+
+    GraphObject::Direction dir;
+    if(getWorld()->inLineOfSightToPlayer(getX(),getY(), dir) && canShout())
+    {
+        setDirection(dir);
+        // Shout at the player
+        getWorld()->playSound(SOUND_PROTESTER_YELL);
+        resetShoutCooldown(); // Reset shout cooldown
+		_restingTime = getWorld()->getRestTime(); // Set resting time after shouting
+        return;
+	}
 
     if (isLeavingField())
     {
@@ -139,9 +156,6 @@ void Protester::doSomething()
         _restingTime = getWorld()->getRestTime();
         return;
     }
-
-
-
 
     if (_restingTime > 0)
     {

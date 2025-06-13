@@ -148,6 +148,34 @@ void StudentWorld::Remove_Dead_Game_Objects()
 	//}
 }
 
+bool StudentWorld::inLineOfSightToPlayer(int x, int y, GraphObject::Direction& outDir) const
+{
+	int px = _iceman->getX();
+	int py = _iceman->getY();
+
+	// Same column?
+	if (x == px) {
+		outDir = (py > y) ? GraphObject::up : GraphObject::down;
+		for (int iy = std::min(y, py) + 1; iy < std::max(y, py); ++iy) {
+			if (Is_Boulder(x, iy, outDir) || Is_Ice(x, iy, outDir))
+				return false;
+		}
+		return true;
+	}
+
+	// Same row?
+	if (y == py) {
+		outDir = (px > x) ? GraphObject::right : GraphObject::left;
+		for (int ix = std::min(x, px) + 1; ix < std::max(x, px); ++ix) {
+			if (Is_Boulder(ix, y, outDir) || Is_Ice(ix, y, outDir))
+				return false;
+		}
+		return true;
+	}
+
+	return false;
+}
+
 //  --- Game State & Level Progression ---
 
 // Finished_Level - Returns true if the player picked up all the oil.

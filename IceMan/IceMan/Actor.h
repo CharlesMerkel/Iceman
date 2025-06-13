@@ -162,10 +162,15 @@ public:
     void setRestingTime(int time) { _restingTime = time; }
     int getRestingTime() const { return _restingTime; }
 
+	void reduceShoutCooldown() { if (_shoutCooldown > 0) _shoutCooldown--; }
+	bool canShout() const { return _shoutCooldown == 0; }
+	void resetShoutCooldown() { _shoutCooldown = 15; } // Reset to 15 ticks
+
 protected:
     bool _leavingField = false;
     bool _stunned = false;
     int _restingTime = 0;
+	int _shoutCooldown = 0; // Cooldown for shouting
 };
 
 // --- Regular Protester ---

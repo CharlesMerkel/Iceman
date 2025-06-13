@@ -51,6 +51,8 @@ public:
 	void Remove_Dead_Game_Objects();
 	void Pickup_Oil(int x, int y);
 	void New_Direction();
+	Iceman* getIceman() const { return _iceman; }
+	bool inLineOfSightToPlayer(int x, int y, GraphObject::Direction& outDir) const;
 	
 	// --- Collision and Movement ---
 	bool Is_Boulder(int x, int y, GraphObject::Direction dir) const;
