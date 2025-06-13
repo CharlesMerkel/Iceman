@@ -163,7 +163,7 @@ public:
     int getRestingTime() const { return _restingTime; }
 
 	void reduceShoutCooldown() { if (_shoutCooldown > 0) _shoutCooldown--; }
-	bool canShout() const { return _shoutCooldown == 0; }
+	bool canShout() const { return _shoutCooldown <= 0; }
 	void resetShoutCooldown() { _shoutCooldown = 15; } // Reset to 15 ticks
     virtual bool is_Protester() { return true; }
 protected:

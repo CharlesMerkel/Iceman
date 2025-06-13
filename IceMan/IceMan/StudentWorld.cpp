@@ -171,20 +171,26 @@ int StudentWorld::move() {
 
 	// doSomething function calls (REALLY doesn't work.)
 
-	/*
+	
+	for (auto it = _actors.begin(); it != _actors.end(); it++) {
+		if ((*it)->isAlive()) {
+			(*it)->doSomething();
+		}
+	}
+
 	if (_iceman->isAlive()) { _iceman->doSomething(); }
 
 	std::vector<Actor*>::iterator it;
 
-	for (auto it = _actors.begin(); it != _actors.end(); it++){
-		if ((*it)->isAlive()) { (*it)->doSomething(); }
+	//for (auto it = _actors.begin(); it != _actors.end(); it++){
+	//	if ((*it)->isAlive()) { (*it)->doSomething(); }
 
-		// Win/Lose conditions
-		// if (Player_Died()) { return GWSTATUS_PLAYER_DIED; }
+	//	// Win/Lose conditions
+	//	// if (Player_Died()) { return GWSTATUS_PLAYER_DIED; }
 
-	  	// if (Finished_Level()) { return GWSTATUS_FINISHED_LEVEL; }
-	    
-	} */
+	//  	// if (Finished_Level()) { return GWSTATUS_FINISHED_LEVEL; }
+	//    
+	//}
 
 	Remove_Dead_Game_Objects();
 

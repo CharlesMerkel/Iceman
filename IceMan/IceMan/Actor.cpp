@@ -118,7 +118,7 @@ Protester::Protester(int imageID, int startX, int startY, Direction dir, double 
     setVisible(true);
     _leavingField = false;
     _stunned = false;
-    _restingTime;
+    _restingTime = 0;
 }
 
 void Protester::doSomething()
@@ -131,11 +131,15 @@ void Protester::doSomething()
     int iceX = getWorld()->getIceman()->getX();
     int iceY = getWorld()->getIceman()->getY();
 
+	int dX = getX() - iceX;
+	int dY = getY() - iceY;
+
+    double distance = sqrt(dX * dX + dY * dY);
+
     GraphObject::Direction dir;
-    if(getWorld()->inLineOfSightToPlayer(getX(),getY(), dir) && canShout())
+    if(distance<= 4.0 && getWorld()->inLineOfSightToPlayer(getX(),getY(), dir) && canShout())
     {
         setDirection(dir);
-        // Shout at the player
         getWorld()->playSound(SOUND_PROTESTER_YELL);
         resetShoutCooldown(); // Reset shout cooldown
 		_restingTime = getWorld()->getRestTime(); // Set resting time after shouting
