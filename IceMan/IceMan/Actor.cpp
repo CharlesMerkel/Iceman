@@ -57,21 +57,33 @@ void Iceman::doSomething()
         case KEY_PRESS_LEFT:
         case 'a':
             if (getDirection() != left) setDirection(left);
+            else if (getX() >= 1 && !getWorld()->Is_Boulder(getX() - 1, getY(), left))
+            { moveTo(getX() - 1, getY()); }
+
             else if (getX() > 0) moveTo(getX() - 1, getY());
             break;
         case KEY_PRESS_RIGHT:
         case 'd':
             if (getDirection() != right) setDirection(right);
+            else if (getX() <= 59 && !getWorld()->Is_Boulder(getX() + 1, getY(), right))
+            { moveTo(getX() + 1, getY()); }
+
             else if (getX() < 60) moveTo(getX() + 1, getY());
             break;
         case KEY_PRESS_UP:
         case 'w':
             if (getDirection() != up) setDirection(up);
+            else if (getY() <= 59 && !getWorld()->Is_Boulder(getX(), getY() + 1, up))
+            { moveTo(getX(), getY() + 1); }
+
             else if (getY() < 60) moveTo(getX(), getY() + 1);
             break;
         case KEY_PRESS_DOWN:
         case 's':
             if (getDirection() != down) setDirection(down);
+            else if (getY() >= 1 && !getWorld()->Is_Boulder(getX(), getY() - 1, down))
+            { moveTo(getX(), getY() - 1); }
+
             else if (getY() > 0) moveTo(getX(), getY() - 1);
             break;
 
@@ -507,16 +519,21 @@ void Oil::doSomething() {
 
 Gold::Gold(int startX, int startY, StudentWorld* world, bool isVisible = true, bool canpick = true)
     : PickUp(IID_GOLD, startX, startY, right, 1.0, 2, world) {
-    setVisible(true);
+    setVisible(false);
     setPickup(true);
-    setTick(100);
+    if (!canpick) { setTick(100); }
 }
 
 void Gold::doSomething() { 
     /* Gold logic */
     if (!isAlive()) { return; }
 
-    if (!isVisible() && getWorld()->Near_Iceman(getX(), getY(), 3)) {
+    if (!isVisible() && getWorld()->Near_Iceman(getX(), getY(), 4)) {
+        setVisible(true);
+        return;
+    }
+
+    if (isPickedUp() && getWorld()->Near_Iceman(getX(), getY(), 3)) {
         setDead();
         getWorld()->increaseScore(10);
         getWorld()->Iceman_ptr()->goldAmmoIncrease();
@@ -531,7 +548,7 @@ void Gold::doSomething() {
             else { reduceTick(); }
         }
         else {
-            setDead();
+            // setDead();
             // bribe the actor
         }
     }

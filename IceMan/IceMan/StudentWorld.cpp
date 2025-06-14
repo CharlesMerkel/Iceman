@@ -123,10 +123,12 @@ int StudentWorld::init() {
 
 	for (int i = 0; i < _Gold; i++){
 		int x = rand() % 61;
-		int y = rand() % 57;
+		int y = rand() % 37 + 20;
 
-		if (No_Overlap(x, y)){
-			_actors.push_back(new Gold(x, y, this, false, true));
+		if (No_Overlap(x, y)) {
+			Gold* gold = new Gold(x, y, this, false, true);
+			// gold->setType(ActorType::Gold);
+			_actors.push_back(gold);
 			Set_Position(x, y, 'G');
 		}
 

@@ -44,7 +44,9 @@ public:
 
     virtual ActorType getType() const;
     void setType(ActorType type) { _type = type; }
-    virtual bool isPickedUp() const { return false; } // default for non-pickups
+
+    void setPickup(bool canPick) { pickupForIceman = canPick; }
+    virtual bool isPickedUp() const { return pickupForIceman; }
 
 protected:
     StudentWorld* getWorld() const { return _world; }
@@ -53,6 +55,7 @@ private:
     StudentWorld* _world;
     ActorType _type = ActorType::Unknown; // Default to avoid undefined behavior
     bool _swAlive;
+    bool pickupForIceman;
 };
 
 // --- Neutral Actors ---
@@ -268,6 +271,7 @@ public:
     Gold(int startX, int startY, StudentWorld* world, bool isVisible, bool exists);
     virtual ActorType getType() const override { return ActorType::Gold; }
     virtual void doSomething() override;
+    bool isPickedUp() const override { return !isAlive(); }
 };
 
 class Sonar : public PickUp
