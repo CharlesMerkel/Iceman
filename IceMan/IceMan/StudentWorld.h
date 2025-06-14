@@ -54,7 +54,9 @@ public:
 	void New_Direction();
 	Iceman* getIceman() const { return _iceman; }
 	bool inLineOfSightToPlayer(int x, int y, GraphObject::Direction& outDir) const;
-	
+	bool canMoveTo(int x, int y, GraphObject::Direction dir) const;
+	void spawnPowerUps();
+
 	// --- Collision and Movement ---
 	bool Is_Boulder(int x, int y, GraphObject::Direction dir) const;
 	bool Is_Ice(int x, int y, GraphObject::Direction dir) const;
@@ -93,8 +95,8 @@ private:
 	Iceman* _iceman;
 	int _Barrels = 0;
 	int _pickedBarrels = 0;
-	int _Boulders;
-	int _Gold;
+	int _Boulders = 0;
+	int _Gold = 0;
 	int _ticksForProtester;
 	int _t_LastProtester;
 	int _nProtesters = 0;

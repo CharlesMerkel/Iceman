@@ -1,5 +1,6 @@
 #include "Actor.h"
 #include "StudentWorld.h"
+#include <random>
 using namespace std;
 
 
@@ -16,13 +17,13 @@ ActorType Actor::getType() const { return ActorType::Unknown; } // Default imple
 HasHP::HasHP(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world, int initialHealth)
     : Actor(imageID, startX, startY, dir, size, depth, world), _health(initialHealth) { }
 
-// Decrease health by 1
-void HasHP::decreaseHealth()
+// Decrease health by int amount
+void HasHP::decreaseHealth(int amount)
 {
-    _health--;
-    if (_health <= 0)
-    {
-        die();  // Trigger the die behavior if health drops to zero
+    if (!isAlive()) return;
+    _health -= amount;
+    if (_health <= 0) {
+        setDead();
     }
 }
 
@@ -103,13 +104,18 @@ bool Iceman::canTakeDamage() const
 	return true; // Iceman can take damage
 }
 
-bool Iceman::isStunned() const { return _isStunned; }
 void Iceman::loseLife()
 {
     getWorld()->decLives();
 }
-//void Iceman::setStunned(bool stunned) { _isStunned = stunned; } This was already defined in Actor.h
-void setStunned(bool stunned){}
+void Iceman::annoy(int amount)
+{
+    decreaseHealth(amount);
+
+    if (!isAlive()) {
+        getWorld()->playSound(SOUND_PLAYER_GIVE_UP);
+    }
+}
 
 // --- Protestor --
 Protester::Protester(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world)
@@ -119,56 +125,111 @@ Protester::Protester(int imageID, int startX, int startY, Direction dir, double 
     _leavingField = false;
     _stunned = false;
     _restingTime = 0;
+	_numStepsInCurrentDirection = 0;
+	_currentDirection = getDirection(); // Initialize current direction
 }
 
 void Protester::doSomething()
 {
     if (!isAlive()) return;
 
-	reduceShoutCooldown(); // Reduce shout cooldown each tick
-
-	//stores the Iceman's position
-    int iceX = getWorld()->getIceman()->getX();
-    int iceY = getWorld()->getIceman()->getY();
-
-	int dX = getX() - iceX;
-	int dY = getY() - iceY;
-
-    double distance = sqrt(dX * dX + dY * dY);
-
-    GraphObject::Direction dir;
-    if(distance<= 4.0 && getWorld()->inLineOfSightToPlayer(getX(),getY(), dir) && canShout())
-    {
-        setDirection(dir);
-        getWorld()->playSound(SOUND_PROTESTER_YELL);
-        resetShoutCooldown(); // Reset shout cooldown
-		_restingTime = getWorld()->getRestTime(); // Set resting time after shouting
-        return;
-	}
-
-    if (isLeavingField())
-    {
-        if (getX() == 60 && getY() == 60)
-        {
-			setVisible(false);
-            return;
-        }
-		//move toward exit
-
-
-        //rest after moving 
-        _restingTime = getWorld()->getRestTime();
-        return;
-    }
-
+	// --- Resting Logic ---
     if (_restingTime > 0)
     {
         _restingTime--;
         return;
     }
 
-    // Basic protester logic goes here
-    // E.g., shout at player, walk toward player, etc.
+	reduceShoutCooldown(); // Reduce shout cooldown each tick
+
+	// --- Leaving Field Logic ---
+    if (isLeavingField())
+    {
+        if (getX() == 60 && getY() == 60)
+        {
+            setVisible(false);
+            setDead();
+            return;
+        }
+        // TODO: Add pathfinding to move toward exit
+        _restingTime = getWorld()->getRestTime();
+        return;
+    }
+
+	// --- Iceman Location Logic ---
+    int iceX = getWorld()->getIceman()->getX();
+    int iceY = getWorld()->getIceman()->getY();
+	int dX = getX() - iceX;
+	int dY = getY() - iceY;
+    double distance = sqrt(dX * dX + dY * dY);
+
+
+	// --- Shout Logic ---
+    GraphObject::Direction dir;
+    if(distance<= 4.0 && getWorld()->inLineOfSightToPlayer(getX(),getY(), dir) && canShout())
+    {
+        setDirection(dir);
+        getWorld()->playSound(SOUND_PROTESTER_YELL);
+        getWorld()->getIceman()->annoy(2);
+        resetShoutCooldown(); // Reset shout cooldown
+		_restingTime = getWorld()->getRestTime(); // Set resting time after shouting
+        return;
+	}
+
+	// --- Line of Sight Movement Logic ---
+    if (distance > 4.0 && getWorld()->inLineOfSightToPlayer(getX(), getY(), dir)) {
+        setDirection(dir);
+        if (getWorld()->canMoveTo(getX(), getY(), dir)) {
+            moveInDirection(dir);
+            _restingTime = getWorld()->getRestTime();
+            return;
+        }
+    }
+
+	// --- Random Movement Logic ---
+    if (_numStepsInCurrentDirection <= 0) {
+        chooseNewDirection();
+    }
+
+    if (getWorld()->canMoveTo(getX(), getY(), _currentDirection)) {
+		setDirection(_currentDirection); //makes sprite face the direction
+        moveInDirection(_currentDirection);
+        _numStepsInCurrentDirection--;
+        _restingTime = getWorld()->getRestTime();
+    }
+    else {
+        _numStepsInCurrentDirection = 0; // Force to pick new direction next time
+    }
+}
+
+void Protester::chooseNewDirection() 
+{
+    GraphObject::Direction dirs[] = { up, down, left, right };
+
+	//random generator for shuffling directions
+	static std::random_device rd; // Random device for seeding
+	static std::mt19937 gen(rd()); // Mersenne Twister RNG no idea how this actually works just found it online
+
+    std::shuffle(std::begin(dirs), std::end(dirs), gen);
+
+    for (auto d : dirs) {
+        if (getWorld()->canMoveTo(getX(), getY(), d)) {
+            _currentDirection = d;
+            setDirection(d);
+            _numStepsInCurrentDirection = 8 + rand() % 53;
+            return;
+        }
+    }
+    _numStepsInCurrentDirection = 0;
+}
+
+void Protester::moveInDirection(GraphObject::Direction dir) {
+    switch (dir) {
+    case left:  moveTo(getX() - 1, getY()); break;
+    case right: moveTo(getX() + 1, getY()); break;
+    case up:    moveTo(getX(), getY() + 1); break;
+    case down:  moveTo(getX(), getY() - 1); break;
+    }
 }
 
 void Protester::die()
@@ -333,18 +394,20 @@ void Oil::doSomething() {
     /* Oil logic */
     if (!isAlive()) { return; }
 
-    if (!isVisible() && getWorld()->Near_Iceman(getX(), getY(), 4)) {
+	// --- Reveal Oil Barrel Logic ---
+    if (!isVisible() && getWorld()->Near_Iceman(getX(), getY(), 4)) 
+    {
         setVisible(true);
         return;
     }
 
-    else if (getWorld()->Near_Iceman(getX(), getY(), 3)) {
+    if (isVisible() && getWorld()->Near_Iceman(getX(), getY(), 3)) 
+    {
         setDead();
-        //play sfx
         getWorld()->increaseScore(1000);
         getWorld()->Pickup_Oil(getX(), getY());
+        // play sfx here
     }
-
 }
 
 Gold::Gold(int startX, int startY, StudentWorld* world, bool isVisible, bool canpick)

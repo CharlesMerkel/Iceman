@@ -43,6 +43,7 @@ public:
     virtual void doSomething() = 0;
 
     virtual ActorType getType() const;
+    void setType(ActorType type) { _type = type; }
     virtual bool isPickedUp() const { return false; } // default for non-pickups
 
 protected:
@@ -50,6 +51,7 @@ protected:
 
 private:
     StudentWorld* _world;
+    ActorType _type = ActorType::Unknown; // Default to avoid undefined behavior
     bool _swAlive;
 };
 
@@ -93,7 +95,7 @@ public:
     HasHP(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world, int initialHealth);
     virtual ~HasHP() = default;
 
-    void decreaseHealth();
+    void decreaseHealth(int amount);
     void setHealth(int health);
     bool isAlive() const;
 
@@ -119,10 +121,11 @@ public:
     //score and life
     int getScore() const;
     void loseLife();
+	void annoy(int amount);
 
 	//damage and stun handling
     bool canTakeDamage() const;
-    bool isStunned() const;
+    bool isStunned() const { return _isStunned; }
 	void setStunned(bool stunned = true) { _canTakeDamage = !stunned; }
 
     //type setting
@@ -155,12 +158,15 @@ public:
 
     void setLeaveField(bool leave = true) { _leavingField = leave; }
     bool isLeavingField() const { return _leavingField; }
-
+    
     void setStunned(bool stunned = true) { _stunned = stunned; }
     bool isStunned() const { return _stunned; }
 
     void setRestingTime(int time) { _restingTime = time; }
     int getRestingTime() const { return _restingTime; }
+
+    void moveInDirection(GraphObject::Direction dir);
+    void chooseNewDirection();
 
 	void reduceShoutCooldown() { if (_shoutCooldown > 0) _shoutCooldown--; }
 	bool canShout() const { return _shoutCooldown <= 0; }
@@ -171,6 +177,8 @@ protected:
     bool _stunned = false;
     int _restingTime = 0;
 	int _shoutCooldown = 0; // Cooldown for shouting
+	int _numStepsInCurrentDirection = 0; // Steps in the current directionq
+	GraphObject::Direction _currentDirection; // Current direction of the protester
 };
 
 // --- Regular Protester ---

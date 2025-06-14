@@ -1,7 +1,7 @@
 ﻿  StudentWorld.cpp
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(271,54): warning C4244: 'argument': conversion from 'double' to 'const _Ty', possible loss of data
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(271,54): warning C4244:         with
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(271,54): warning C4244:         [
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(271,54): warning C4244:             _Ty=size_t
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(271,54): warning C4244:         ]
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(327,54): warning C4244: 'argument': conversion from 'double' to 'const _Ty', possible loss of data
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(327,54): warning C4244:         with
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(327,54): warning C4244:         [
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(327,54): warning C4244:             _Ty=size_t
+C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(327,54): warning C4244:         ]
   IceMan.vcxproj -> C:\Users\charl\source\repos\Iceman\IceMan\Debug\IceMan.exe

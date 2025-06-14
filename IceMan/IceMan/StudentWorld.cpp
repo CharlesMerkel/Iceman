@@ -79,22 +79,28 @@ int StudentWorld::init() {
 		}
 	}
 
-	// Spawn Iceman
+	// --- Spawn Iceman ---
 	_iceman = new Iceman(this);
 
-	// Spawn Oil Barrels (?)
+	// --- Barrel Initialization ---
 	_Barrels = min<unsigned int>(2 + getLevel(), 21);
+
+	// --- Boulder Initialization ---
+	_Boulders = min<int>(6, getLevel() / 2 + 2);
 
 	for (int j = 0; j < _Barrels; j++) {
 		int x = rand() % 61;
 		int y = rand() % 57;
 
 		if (No_Overlap(x, y)) {
-			_actors.push_back(new Oil(x, y, this));
+			Oil* oil = new Oil(x, y, this);
+			oil->setType(ActorType::OilBarrel);
+			_actors.push_back(oil);
 			Set_Position(x, y, 'O');
 		}
-
-		else { j--; }
+		else {
+			j--; // Retry placement
+		}
 	}
 
 	// Spawn Boulder (?)
@@ -129,8 +135,6 @@ int StudentWorld::init() {
 	// Spawn a RegularProtester
 	_actors.push_back(new RegularProtester(this));
 
-
-
 	return GWSTATUS_CONTINUE_GAME;
 }
 
@@ -140,64 +144,45 @@ int StudentWorld::init() {
 int StudentWorld::move() {
 	Update_Display_Text();
 
-	if(_iceman)
+	// --- Iceman Management ---
+	if(_iceman && _iceman->isAlive())
 	_iceman->doSomething(); //let the iceman act this tick
 
+	// --- Power Up Management ---
+	spawnPowerUps();
 
-	// Power Up Spawning
-
-	int dropChance = getLevel() * 25 + 300;
-	int n = rand() % dropChance + 1;
-
-	if (n <= 1)
+	// --- Actor Management ---
+	for (auto it = _actors.begin(); it != _actors.end(); ++it) 
 	{
-		int chance = rand() % 5 + 1;
+		Actor* a = *it;
 
-		if (chance <= 1)
-		{ _actors.push_back(new Sonar(this)); }
+		if (!a || !a->isAlive())
+			continue;
 
-		else if (chance > 1){
-			int x = rand() % 61;
-			int y = rand() % 61;
+		// Catch any unexpected issues in actor logic
+		try {
+			a->doSomething();
+		}
+		catch (...) {
+			// Safely kill problematic actor and avoid repeated crash
+			a->setDead();
 
-			while (!Can_Add_Waterpool(x, y)){
-				x = rand() % 61;
-				y = rand() % 61;
-			}
-
-			_actors.push_back(new WaterPool(x, y, this));
+			// Optional: Set game stat text for debugging (since you can't see console)
+			setGameStatText("Error: Actor crash in doSomething()");
 		}
 	}
 
-	// doSomething function calls (REALLY doesn't work.)
-
-	
-	for (auto it = _actors.begin(); it != _actors.end(); it++) {
-		if ((*it)->isAlive()) {
-			(*it)->doSomething();
-		}
+	// --- Lose conditions ---
+	if (_iceman && !_iceman->isAlive()) {
+		decLives();
+		return GWSTATUS_PLAYER_DIED;
 	}
-
-	if (_iceman->isAlive()) { _iceman->doSomething(); }
-
-	std::vector<Actor*>::iterator it;
-
-	//for (auto it = _actors.begin(); it != _actors.end(); it++){
-	//	if ((*it)->isAlive()) { (*it)->doSomething(); }
-
-	//	// Win/Lose conditions
-	//	// if (Player_Died()) { return GWSTATUS_PLAYER_DIED; }
-
-	//  	// if (Finished_Level()) { return GWSTATUS_FINISHED_LEVEL; }
-	//    
-	//}
-
+	// --- Win conditions ---
+	/*if (Finished_Level()) {
+		return GWSTATUS_FINISHED_LEVEL;
+	}*/
 	Remove_Dead_Game_Objects();
 
-	// Win/Lose conditions (Again, just in case an actor doesn't call their doSomethings)
-	// if (Player_Died()) { return GWSTATUS_PLAYER_DIED; }
-
-	// if (Finished_Level()) { return GWSTATUS_FINISHED_LEVEL; }
 	return GWSTATUS_CONTINUE_GAME;
 }
 
@@ -220,8 +205,51 @@ void StudentWorld::cleanUp() {
 	_ptrIce.clear();
 }
 
-//  --- Actor Management --
+//  --- Actor Management ---
  
+void StudentWorld::spawnPowerUps() {
+	int dropChance = getLevel() * 25 + 300;
+	if (rand() % dropChance == 0) {
+		int chance = rand() % 5;
+		if (chance == 0)
+			_actors.push_back(new Sonar(this));
+		else {
+			int x = rand() % 61;
+			int y = rand() % 61;
+			int tries = 100;
+			while (!Can_Add_Waterpool(x, y) && tries-- > 0) {
+				x = rand() % 61;
+				y = rand() % 61;
+			}
+			if (tries > 0)
+				_actors.push_back(new WaterPool(x, y, this));
+		}
+	}
+
+	//orignal code
+		//int dropChance = getLevel() * 25 + 300;
+	//int n = rand() % dropChance + 1;
+
+	//if (n <= 1)
+	//{
+	//	int chance = rand() % 5 + 1;
+
+	//	if (chance <= 1)
+	//	{ _actors.push_back(new Sonar(this)); }
+
+	//	else if (chance > 1){
+	//		int x = rand() % 61;
+	//		int y = rand() % 61;
+
+	//		while (!Can_Add_Waterpool(x, y)){
+	//			x = rand() % 61;
+	//			y = rand() % 61;
+	//		}
+
+	//		_actors.push_back(new WaterPool(x, y, this));
+	//	}
+	//}
+}
 // Can_Face - Checks if the Actor can face the Iceman based off of its coordinates &
 //current direction, returns false if unable.
 bool StudentWorld::Can_Face(int x, int y, GraphObject::Direction& dir){
@@ -265,6 +293,34 @@ bool StudentWorld::Can_Face(int x, int y, GraphObject::Direction& dir){
 
 		return rv;
 	}
+
+bool StudentWorld::canMoveTo(int x, int y, GraphObject::Direction dir) const {
+	int destX = x;
+	int destY = y;
+
+	// Move 1 unit in the intended direction
+	switch (dir) {
+	case GraphObject::up:    destY += 1; break;
+	case GraphObject::down:  destY -= 1; break;
+	case GraphObject::left:  destX -= 1; break;
+	case GraphObject::right: destX += 1; break;
+	default: break;
+	}
+
+	// Check map boundaries (each actor occupies 4x4, so we check up to +3)
+	if (destX < 0 || destY < 0 || destX + 3 >= 64 || destY + 3 >= 60)
+		return false;
+
+	// Check for boulders
+	if (Is_Boulder(destX, destY, dir))
+		return false;
+
+	// Check for ice
+	if (Is_Ice(destX, destY, dir))
+		return false;
+
+	return true;
+}
 
 // Checks if a new protester can spawn based off of the level and tick.
 bool StudentWorld::Can_Add_Protester(){
@@ -315,9 +371,16 @@ bool StudentWorld::isPlayerStunned() const
 }
 
 // Remove_Dead_Game_Objects - Removes all dead actors & updates the actor's position.
-void StudentWorld::Remove_Dead_Game_Objects() {
+void StudentWorld::Remove_Dead_Game_Objects() 
+{
 	for (auto it = _actors.begin(); it != _actors.end(); ) {
 		Actor* actor = *it;
+
+		// Don't delete Iceman if somehow in the actor list
+		if (actor == _iceman) {
+			++it;
+			continue;
+		}
 
 		if (!actor->isAlive()) {
 			Set_Position(actor->getX(), actor->getY(), 0);
@@ -363,15 +426,24 @@ bool StudentWorld::inLineOfSightToPlayer(int x, int y, GraphObject::Direction& o
 // Finished_Level - Returns true if the player picked up all the oil.
 bool StudentWorld::Finished_Level()
 {
-	// Check if all oil barrels have been picked up
-	for (Actor* actor : _actors) 
+	for (Actor* actor : _actors)
 	{
-		if (actor->getType() == ActorType::OilBarrel && !actor->isPickedUp())
-		{
-			return false; // Not all oil barrels have been picked up
+		if (!actor) continue;
+
+		// Optional: safer type check
+		ActorType type;
+		try {
+			type = actor->getType();
+		}
+		catch (...) {
+			continue;
+		}
+
+		if (type == ActorType::OilBarrel && !actor->isPickedUp()) {
+			return false;
 		}
 	}
-	return true; // All oil barrels have been picked up
+	return true;
 }
 
 // Player_Died - Checks if the player died, if so, then decrement lives and returns true.
@@ -458,7 +530,7 @@ bool StudentWorld::Is_Ice(int x, int y, GraphObject::Direction dir) const
 	}
 	// Check if there is ice at the new (x, y)
 	for (Ice* ice : _ptrIce) {
-		if (ice->getX() == x && ice->getY() == y) {
+		if (ice && ice->getX() == x && ice->getY() == y) {
 			return true; // Ice found at the specified coordinates
 		}
 	}
