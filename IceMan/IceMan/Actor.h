@@ -98,9 +98,16 @@ public:
     HasHP(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world, int initialHealth);
     virtual ~HasHP() = default;
 
-    void decreaseHealth(int amount);
-    void setHealth(int health);
+    void decreaseHealth(int amount); 
     bool isAlive() const;
+
+    void setHealth(int health) { _health = health; }
+
+    virtual void setDead()
+    {
+        Actor::setDead();
+        setHealth(0);
+    }
 
 protected:
     virtual void die() = 0;

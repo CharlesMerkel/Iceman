@@ -72,8 +72,7 @@ public:
 	bool Player_Died();
 	bool isPlayerStunned() const;
 
-	//  --- Gameplay & Interactions ---
-	// [ None of these inteactions work ]
+	//  --- Gameplay & Interactions --- 
 
 	Iceman* Iceman_ptr() { return _iceman; }
 	unsigned int getTicks() const { return _ticks; }

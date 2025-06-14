@@ -27,10 +27,7 @@ void HasHP::decreaseHealth(int amount)
     if (_health <= 0) {
         setDead();
     }
-}
-
-// Set the health explicitly
-void HasHP::setHealth(int health) { _health = health; }
+} 
 
 // Check if still alive
 bool HasHP::isAlive() const { return _health > 0; }
@@ -146,10 +143,9 @@ void Iceman::doSomething()
     { GameController::getInstance().playSound(SOUND_DIG); }
 }
 
-void Iceman::die() //this is wrong Fixlater
-{
-    setVisible(false);
-    setHealth(10);
+void Iceman::die() {
+    setDead();
+    GameController::getInstance().playSound(SOUND_PLAYER_GIVE_UP);
 }
 
 bool Iceman::canTakeDamage() const
@@ -506,14 +502,7 @@ PickUp::PickUp(int imageID, int startX, int startY, Direction dir, double size, 
     setVisible(true);
     _tickSpan = max<unsigned int>(100, 300 - 10 * (getWorld()->getLevel()));
 }
-
-/* PickUp doesn't need a doSomething()
-void PickUp::doSomething()
-{
-    // Placeholder logic for PickUp actions
-    // This can be customized to check collisions, player interactions, etc.
-}
-*/
+ 
 // --- Pickups (Oil, Gold, Sonar, WaterPool) ---
 Oil::Oil(int startX, int startY, StudentWorld* world)
     : PickUp(IID_BARREL, startX, startY, right, 1.0, 2, world) {
