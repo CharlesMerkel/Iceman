@@ -46,7 +46,7 @@ public:
     void setType(ActorType type) { _type = type; }
 
     void setPickup(bool canPick) { pickupForIceman = canPick; }
-    virtual bool isPickedUp() const { return pickupForIceman; }
+    virtual bool isPickedUp() const { return false; }
 
 protected:
     StudentWorld* getWorld() const { return _world; }
