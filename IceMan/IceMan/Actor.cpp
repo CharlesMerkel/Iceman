@@ -74,6 +74,54 @@ void Iceman::doSomething()
             if (getDirection() != down) setDirection(down);
             else if (getY() > 0) moveTo(getX(), getY() - 1);
             break;
+
+        // Reset Map
+        case KEY_PRESS_ESCAPE:
+            setDead();
+            break;
+
+        // Squirt
+        case KEY_PRESS_SPACE:
+            if (_waterAmmo > 0){
+
+                if (getDirection() == right && getX() < 60){
+                    getWorld()->Squirt_Water(getX() + 4, getY(), right);
+                    _waterAmmo--;
+                }
+
+                else if (getDirection() == left && getX() > 0){
+                    getWorld()->Squirt_Water(getX() - 4, getY(), left);
+                    _waterAmmo--;
+                }
+
+                else if (getDirection() == up && getY() < 60){
+                    getWorld()->Squirt_Water(getX(), getY() + 4, up);
+                    _waterAmmo--;
+                }
+
+                else if (getDirection() == down && getY() > 0){
+                    getWorld()->Squirt_Water(getX(), getY() - 4, down);
+                    _waterAmmo--;
+                }
+            }
+            break;
+
+        // Ping!
+        case 'Z':
+        case 'z':
+            if (_sonarAmmo > 0){
+                _sonarAmmo--;
+                getWorld()->Sonar_Used(getX(), getY());
+            }
+            break;
+
+        // Place Gold
+        case KEY_PRESS_TAB:
+            if (_goldAmmo > 0){
+                getWorld()->dropGold(getX(), getY());
+                _goldAmmo--;
+            }
+            break;
         }
     }
 	//this is the code for Iceman breaking ice
@@ -337,7 +385,7 @@ void Boulder::doSomething() {
 
     else if (_bState == 1 && _tick == 30) {
         _bState = 2;
-        // start playing sfx
+        GameController::getInstance().playSound(SOUND_FALLING_ROCK);
     }
 
     else if (_bState == 2) {
@@ -361,7 +409,7 @@ Squirt::Squirt(int startX, int startY, Direction dir, StudentWorld* world)
 
 void Squirt::doSomething() { 
     /* Implement Squirt behavior here */
-    if (getWorld()->Protester_Annoyed(getX(), getY(), 2)) { setDead();; }
+    if (getWorld()->Protester_Annoyed(getX(), getY(), 2)) { setDead(); }
     if (_sDistance == 4) { setDead();; }
 
     else if (getDirection() == up) {
@@ -438,7 +486,7 @@ void Oil::doSomething() {
         setDead();
         getWorld()->increaseScore(1000);
         getWorld()->Pickup_Oil(getX(), getY());
-        // play sfx here
+        GameController::getInstance().playSound(SOUND_FOUND_OIL);
     }
 }
 
@@ -455,9 +503,9 @@ void Gold::doSomething() {
 
     if (!isVisible() && getWorld()->Near_Iceman(getX(), getY(), 3)) {
         setDead();
-        //play sfx
         getWorld()->increaseScore(10);
         getWorld()->Iceman_ptr()->goldAmmoIncrease();
+        GameController::getInstance().playSound(SOUND_GOT_GOODIE);
     }
 
     else if (!isPickedUp()) {
@@ -486,9 +534,9 @@ void Sonar::doSomething() {
 
     if (getWorld()->Near_Iceman(getX(), getY(), 3)) {
         setDead();
-        //play sfx
         getWorld()->increaseScore(75);
         getWorld()->Iceman_ptr()->sonarAmmoIncrease();
+        GameController::getInstance().playSound(SOUND_GOT_GOODIE);
     }
 
     else if (getTick() == 0) { setDead(); }
@@ -507,9 +555,9 @@ void WaterPool::doSomething() {
 
     if (getWorld()->Near_Iceman(getX(), getY(), 3)) {
         setDead();
-        //play sfx
         getWorld()->increaseScore(100);
         getWorld()->Iceman_ptr()->waterAmmoIncrease();
+        GameController::getInstance().playSound(SOUND_GOT_GOODIE);
     }
 
     else if (getTick() == 0) { setDead(); }

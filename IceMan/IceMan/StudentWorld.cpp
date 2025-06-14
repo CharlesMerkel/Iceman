@@ -641,7 +641,7 @@ bool StudentWorld::Set_Position(int x, int y, char actortype)
 // Squirt_Water - Creates a squirt object from the player
 void StudentWorld::Squirt_Water(int x, int y, GraphObject::Direction dir){
 	_actors.push_back(new Squirt(x, y, dir, this));
-    // play sfx
+	GameController::getInstance().playSound(SOUND_PLAYER_SQUIRT);
 }
 // Sonar_Used - Makes all actors within a 12 unit radius from the player visible.
 void StudentWorld::Sonar_Used(int x, int y) {
