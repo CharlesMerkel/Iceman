@@ -513,7 +513,11 @@ bool StudentWorld::Is_Ice(int x, int y, GraphObject::Direction dir) const
 }
 
 // No_Ice_Or_Boulder - Checks if there is neither ice nor a boulder in a specified direction from given coordinates.
+bool StudentWorld::No_Ice_Or_Boulder(int x, int y, GraphObject::Direction dir) const {
+	if (!Is_Ice(x, y, dir) && !Is_Boulder(x, y, dir)) { return true; }
 
+	return false;
+}
 
 // Can_Fall - Checks if an object at given coords can fall downward (Check if no ice or boulder below it).
 bool StudentWorld::Can_Fall(int x, int y) const
@@ -605,8 +609,7 @@ void StudentWorld::Boulder_Annoyed(int x, int y)
 }
 
 // Protester_Annoyed - Allows the squirt object to damage protesters.
-bool StudentWorld::Protester_Annoyed(int x, int y, int dmg)
-{
+bool StudentWorld::Protester_Annoyed(int x, int y, int dmg) {
 	for (Actor* actor : _actors)
 	{
 		if (!actor || !actor->isAlive())
@@ -629,6 +632,7 @@ bool StudentWorld::Protester_Annoyed(int x, int y, int dmg)
 		}
 	}
 	return false;
+
 }
 
 // Set_Position - Sets a 4x4 actor in a specified coordinate.

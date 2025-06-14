@@ -5,5 +5,3 @@ C:\Users\josch\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(300,54): warni
 C:\Users\josch\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(300,54): warning C4244:             _Ty=unsigned int
 C:\Users\josch\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(300,54): warning C4244:         ]
   IceMan.vcxproj -> C:\Users\josch\source\repos\Iceman\IceMan\Debug\IceMan.exe
-  Actor.cpp
-  IceMan.vcxproj -> C:\Users\charl\source\repos\Iceman\IceMan\Debug\IceMan.exe
