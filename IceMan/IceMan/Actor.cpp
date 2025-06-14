@@ -124,7 +124,7 @@ Protester::Protester(int imageID, int startX, int startY, Direction dir, double 
     setVisible(true);
     _leavingField = false;
     _stunned = false;
-    _restingTime = 0;
+	_restingTime = 0;
 	_numStepsInCurrentDirection = 0;
 	_currentDirection = getDirection(); // Initialize current direction
 
@@ -153,34 +153,46 @@ void Protester::doSomething()
             setDead();
             return;
         }
-        // TODO: Add pathfinding to move toward exit
+
+        // TODO: Pathfinding to leave field (not yet implemented)
         _restingTime = getWorld()->getRestTime();
         return;
     }
 
-    // --- Iceman Location Logic ---
+    // --- Iceman Detection ---
     int iceX = getWorld()->getIceman()->getX();
     int iceY = getWorld()->getIceman()->getY();
     int dX = getX() - iceX;
     int dY = getY() - iceY;
     double distance = sqrt(dX * dX + dY * dY);
 
-    // --- Shout Logic ---
     GraphObject::Direction dir;
-    if (distance <= 4.0 && getWorld()->inLineOfSightToPlayer(getX(), getY(), dir) && canShout())
+
+    // --- Shout Logic ---
+    if (distance <= 4.0 && getWorld()->inLineOfSightToPlayer(getX(), getY(), dir))
     {
-        setDirection(dir);
-        getWorld()->playSound(SOUND_PROTESTER_YELL);
-        getWorld()->getIceman()->annoy(2);
-        resetShoutCooldown();
-        _restingTime = getWorld()->getRestTime();
+        if (canShout())
+        {
+            if (getDirection() != dir)
+                setDirection(dir);
+
+            getWorld()->playSound(SOUND_PROTESTER_YELL);
+            getWorld()->getIceman()->annoy(2);
+            resetShoutCooldown();
+            _restingTime = getWorld()->getRestTime();
+            return;
+        }
+
+        // If can't shout yet, don't move through Iceman
         return;
     }
 
-    // --- Line of Sight Movement ---
-    if (distance > 4.0 && getWorld()->inLineOfSightToPlayer(getX(), getY(), dir)) {
+    // --- Line-of-Sight Movement (toward Iceman) ---
+    if (getWorld()->inLineOfSightToPlayer(getX(), getY(), dir))
+    {
         setDirection(dir);
-        if (getWorld()->canMoveTo(getX(), getY(), dir)) {
+        if (getWorld()->canMoveTo(getX(), getY(), dir))
+        {
             moveTo(getX() + dxForDir(dir), getY() + dyForDir(dir));
             _restingTime = getWorld()->getRestTime();
             return;
@@ -188,17 +200,20 @@ void Protester::doSomething()
     }
 
     // --- Random Movement ---
-    if (_numStepsInCurrentDirection <= 0) {
+    if (_numStepsInCurrentDirection <= 0)
+    {
         chooseNewDirection(); // sets _currentDirection and _numStepsInCurrentDirection
     }
 
-    if (getWorld()->canMoveTo(getX(), getY(), _currentDirection)) {
+    if (getWorld()->canMoveTo(getX(), getY(), _currentDirection))
+    {
         setDirection(_currentDirection);
         moveTo(getX() + dxForDir(_currentDirection), getY() + dyForDir(_currentDirection));
         _numStepsInCurrentDirection--;
         _restingTime = getWorld()->getRestTime();
     }
-    else {
+    else
+    {
         _numStepsInCurrentDirection = 0;
     }
 }
@@ -301,6 +316,7 @@ void Ice::doSomething() { /* Ice is static; does nothing each tick */ }
 Boulder::Boulder(int startX, int startY, StudentWorld* world)
     : Actor(IID_BOULDER, startX, startY, down, 1.0, 1, world)
 {
+    setType(ActorType::Boulder);
     setVisible(true);
 }
 

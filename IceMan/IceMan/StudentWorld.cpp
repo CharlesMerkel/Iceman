@@ -295,34 +295,6 @@ bool StudentWorld::Can_Face(int x, int y, GraphObject::Direction& dir){
 		return rv;
 	}
 
-bool StudentWorld::canMoveTo(int x, int y, GraphObject::Direction dir) const {
-	int destX = x;
-	int destY = y;
-
-	// Move 1 unit in the intended direction
-	switch (dir) {
-	case GraphObject::up:    destY += 1; break;
-	case GraphObject::down:  destY -= 1; break;
-	case GraphObject::left:  destX -= 1; break;
-	case GraphObject::right: destX += 1; break;
-	default: break;
-	}
-
-	// Check map boundaries (each actor occupies 4x4, so we check up to +3)
-	if (destX < 0 || destY < 0 || destX + 3 >= 64 || destY + 3 >= 60)
-		return false;
-
-	// Check for boulders
-	if (Is_Boulder(destX, destY, dir))
-		return false;
-
-	// Check for ice
-	if (Is_Ice(destX, destY, dir))
-		return false;
-
-	return true;
-}
-
 // Checks if a new protester can spawn based off of the level and tick.
 bool StudentWorld::Can_Add_Protester(){
     int maxProtesters = std::min<unsigned int>(15, 2 + getLevel() * 1.5);
@@ -580,6 +552,49 @@ bool StudentWorld::Can_Shout() const
 	return false; // Iceman cannot be shouted at
 }
 
+bool StudentWorld::canMoveTo(int x, int y, GraphObject::Direction dir) const
+{
+	// Calculate new position after moving
+	switch (dir) {
+	case GraphObject::left:  x -= 1; break;
+	case GraphObject::right: x += 1; break;
+	case GraphObject::up:    y += 1; break;
+	case GraphObject::down:  y -= 1; break;
+	}
+
+	// Clamp to legal bounds — we subtract 3 to ensure 4x4 block stays in bounds
+	if (x < 0 || x > 60 || y < 0 || y > 60)
+		return false;
+
+	// Don't allow movement through tunnel shaft
+	if (x >= 30 && x <= 33 && y >= 4 && y <= 59)
+		return false;
+
+	// Block movement if any tile in the 4x4 destination block contains ice
+	for (Ice* ice : _ptrIce) {
+		if (ice == nullptr ||!ice->isAlive())
+			continue;
+
+		int ix = ice->getX();
+		int iy = ice->getY();
+
+		if (ix >= x && ix < x + 4 && iy >= y && iy < y + 4)
+			return false;
+	}
+
+	// Check for boulder blocking destination
+	for (Actor* actor : _actors) {
+		if (actor == nullptr || !actor->isAlive()) continue;
+		if (actor->getType() != ActorType::Boulder) continue;
+
+		int bx = actor->getX();
+		int by = actor->getY();
+		if (bx >= x && bx < x + 4 && by >= y && by < y + 4)
+			return false;
+	}
+
+	return true;
+}
 
 int StudentWorld::getRestTime() const
 {
