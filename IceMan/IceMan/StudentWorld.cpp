@@ -681,17 +681,17 @@ void StudentWorld::SpawnIce()
 // Remove_Ice_At - Attempts to remove ice from the grid at the specified coordinates. If successful, it returns true.
 bool StudentWorld::Remove_Ice_At(int x, int y)
 {
-	for (size_t i = 0; i < _ptrIce.size(); ++i)
-	{
-		if (_ptrIce[i] && _ptrIce[i]->getX() == x && _ptrIce[i]->getY() == y)
-		{
-			delete _ptrIce[i];
-			_ptrIce[i] = nullptr; 
-
-			return true;
+	bool returnVal = false;
+	for (int i = 0; i < _NUMIce; i++)
+		if (_ptrIce[i] != nullptr) {
+			if (_ptrIce[i]->getX() >= x && _ptrIce[i]->getX() <= x + 3 && _ptrIce[i]->getY() >= y && _ptrIce[i]->getY() <= y + 3)
+			{
+				delete _ptrIce[i];
+				_ptrIce[i] = nullptr;
+				returnVal = true;
+			}
 		}
-	}
-	return false; // No ice was removed at this location
+	return returnVal; // No Ice returned
 }
 
 //Destructor - Cleans up all actors and ice when the game world is destroyed. including forced closes.

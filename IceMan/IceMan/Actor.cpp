@@ -128,13 +128,8 @@ void Iceman::doSomething()
     int icemanX = getX();
     int icemanY = getY();
 
-    for (int dx = 0; dx < 4; ++dx)
-    {
-        for (int dy = 0; dy < 4; ++dy)
-        {
-            getWorld()->Remove_Ice_At(icemanX + dx, icemanY + dy);
-        }
-    }
+    if (getWorld()->Remove_Ice_At(getX(), getY()))
+    { GameController::getInstance().playSound(SOUND_DIG); }
 }
 
 void Iceman::die() //this is wrong Fixlater
