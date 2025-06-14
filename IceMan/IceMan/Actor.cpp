@@ -367,10 +367,8 @@ void Boulder::doSomething() {
     /* Implement Boulder behavior here */
     if (!isAlive()) { return; }
 
-    if (_bState == 0) 
-    {
-        if (!getWorld()->Is_Ice(getX(), getY(), GraphObject::down)) 
-        {
+    if (_bState == 0) {
+        if (!getWorld()->Is_Ice(getX(), getY() - 1, GraphObject::down)) {
             _bState = 1;
             _tick = 0;
         }
