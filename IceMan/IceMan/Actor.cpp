@@ -9,6 +9,8 @@ Actor::Actor(int imageID, int startX, int startY, Direction dir, double size, un
     : GraphObject(imageID, startX, startY, dir, size, depth), _world(world), _swAlive(true)
 {
     setVisible(true);
+    _world = world;
+    _swAlive = true;
 }
 
 ActorType Actor::getType() const { return ActorType::Unknown; } // Default implementation, can be overridden
@@ -533,7 +535,7 @@ void Gold::doSomething() {
         return;
     }
 
-    if (isPickedUp() && getWorld()->Near_Iceman(getX(), getY(), 3)) {
+    if (isVisible() && getWorld()->Near_Iceman(getX(), getY(), 3)) {
         setDead();
         getWorld()->increaseScore(10);
         getWorld()->Iceman_ptr()->goldAmmoIncrease();
