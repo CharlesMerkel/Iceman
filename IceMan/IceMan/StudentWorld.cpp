@@ -626,8 +626,28 @@ void StudentWorld::Boulder_Annoyed(int x, int y)
 // Protester_Annoyed - Allows the squirt object to damage protesters.
 bool StudentWorld::Protester_Annoyed(int x, int y, int dmg)
 {
-// Input Protester Damage 
-	return false; // Placeholder implementation, should be replaced with actual logic
+	for (Actor* actor : _actors)
+	{
+		if (!actor || !actor->isAlive())
+			continue;
+
+		ActorType type = actor->getType();
+		if (type == ActorType::RegularProtester || type == ActorType::HardcoreProtester)
+		{
+			int dx = actor->getX() - x;
+			int dy = actor->getY() - y;
+			if (dx * dx + dy * dy <= 3 * 3)
+			{
+				Protester* p = dynamic_cast<Protester*>(actor);
+				if (p && !p->isStunned())
+				{
+					p->annoy(dmg); // Deal damage and auto-stun
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }
 
 // Set_Position - Sets a 4x4 actor in a specified coordinate.

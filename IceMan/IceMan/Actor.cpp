@@ -179,9 +179,11 @@ void Protester::doSomething()
     if (!isAlive()) return;
 
     // --- Resting Logic ---
-    if (_restingTime > 0)
-    {
+    if (_restingTime > 0) {
         _restingTime--;
+        if (_restingTime == 0) {
+            _stunned = false;  //Reset stun after rest
+        }
         return;
     }
 
@@ -307,11 +309,31 @@ void Protester::moveInDirection(GraphObject::Direction dir) {
     }
 }
 
+void Protester::annoy(int damage)
+{
+    if (isLeavingField() || isStunned()) return;
+
+    _health -= damage;
+    if (_health <= 0)
+    {
+        // Start leaving field
+        die();
+
+    }
+    else
+    {
+        getWorld()->playSound(SOUND_PROTESTER_ANNOYED);
+        _restingTime = std::max<unsigned int>(50u, static_cast<unsigned int>(100 - getWorld()->getLevel() * 10));
+        _stunned = true;
+    }
+}
 void Protester::die()
 {
     if (!isLeavingField())
     {
-        setLeaveField();
+        setLeaveField(true);
+        getWorld()->playSound(SOUND_PROTESTER_GIVE_UP);
+        getWorld()->increaseScore(100);
 		// add pathing logic to exit the field
     }
 }

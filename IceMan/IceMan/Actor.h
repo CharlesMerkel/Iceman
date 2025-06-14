@@ -161,6 +161,7 @@ public:
     
     void setStunned(bool stunned = true) { _stunned = stunned; }
     bool isStunned() const { return _stunned; }
+	void annoy(int amount);
 
     void setRestingTime(int time) { _restingTime = time; }
     int getRestingTime() const { return _restingTime; }
