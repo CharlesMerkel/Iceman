@@ -469,28 +469,16 @@ void StudentWorld::Pickup_Oil(int x, int y)
 //  --- Collision & Movement Checks ---
 
 // Is_Boulder - Checks if there is a boulder in the specified direction from the given coordinates.
-bool StudentWorld::Is_Boulder(int x, int y, GraphObject::Direction dir) const
-{
-	// Calculate the adjacent tile based on direction
-	switch (dir) {
-	case GraphObject::right:
-		if (Get_Position(x + 3, y) == 'B' || Get_Position(x + 3, y + 3) == 'B')
-		{ return true; }
-		break;
-	case GraphObject::left:
-		if (Get_Position(x, y) == 'B' || Get_Position(x, y + 3) == 'B')
-		{ return true; }
-		break;
-	case GraphObject::up:
-		if (Get_Position(x, y + 3) == 'B' || Get_Position(x + 3, y + 3) == 'B')
-		{ return true; }
-		break;
-	case GraphObject::down:
-		if (Get_Position(x, y) == 'B' || Get_Position(x + 3, y) == 'B')
-		{ return true; }
-		break;
-	}
+bool StudentWorld::Is_Boulder(int x, int y, GraphObject::Direction dir) const {
+	for (Actor* a : _actors) {
+		if (a->getType() == ActorType::Boulder && a->isAlive()) {
+			int ax = a->getX();
+			int ay = a->getY(); 
 
+			if (abs(ax - x) <= 3 && abs(ay - y) <= 3)
+			{ return true; }
+		}
+	}
 	return false;
 }
 
@@ -545,7 +533,7 @@ bool StudentWorld::No_Ice_Or_Boulder(int x, int y, GraphObject::Direction dir) c
 bool StudentWorld::Can_Fall(int x, int y) const {
 	if (y < 0) { return false; }
 	if (!No_Ice_Or_Boulder(x, y, GraphObject::down))
-	{ return false;}
+	{ return false; }
 	return true;
 }
 

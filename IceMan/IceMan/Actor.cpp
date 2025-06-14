@@ -59,7 +59,7 @@ void Iceman::doSomething()
             else if (getX() >= 1 && !getWorld()->Is_Boulder(getX() - 1, getY(), left))
             { moveTo(getX() - 1, getY()); }
 
-            else if (getX() > 0) moveTo(getX() - 1, getY());
+            //else if (getX() > 0) moveTo(getX() - 1, getY());
             break;
         case KEY_PRESS_RIGHT:
         case 'd':
@@ -67,7 +67,7 @@ void Iceman::doSomething()
             else if (getX() <= 59 && !getWorld()->Is_Boulder(getX() + 1, getY(), right))
             { moveTo(getX() + 1, getY()); }
 
-            else if (getX() < 60) moveTo(getX() + 1, getY());
+            //else if (getX() < 60) moveTo(getX() + 1, getY());
             break;
         case KEY_PRESS_UP:
         case 'w':
@@ -75,7 +75,7 @@ void Iceman::doSomething()
             else if (getY() <= 59 && !getWorld()->Is_Boulder(getX(), getY() + 1, up))
             { moveTo(getX(), getY() + 1); }
 
-            else if (getY() < 60) moveTo(getX(), getY() + 1);
+            //else if (getY() < 60) moveTo(getX(), getY() + 1);
             break;
         case KEY_PRESS_DOWN:
         case 's':
@@ -83,7 +83,7 @@ void Iceman::doSomething()
             else if (getY() >= 1 && !getWorld()->Is_Boulder(getX(), getY() - 1, down))
             { moveTo(getX(), getY() - 1); }
 
-            else if (getY() > 0) moveTo(getX(), getY() - 1);
+           // else if (getY() > 0) moveTo(getX(), getY() - 1);
             break;
 
         // Reset Map
@@ -397,18 +397,13 @@ void HardcoreProtester::die()
 // --- Ice ---
 Ice::Ice(int startX, int startY, StudentWorld* world)
     : Actor(IID_ICE, startX, startY, right, 0.25, 3, world)
-{
-    setVisible(true);
-}
+{ setVisible(true); }
 
-Ice::~Ice()
-{
-    setVisible(false);
-}
+Ice::~Ice() { setVisible(false); }
 
-void Ice::doSomething() { /* Ice is static; does nothing each tick */ }
+void Ice::doSomething() { }
 
-// --- Boulder --- [ Everything past this might not work ] 
+// --- Boulder ---  
 Boulder::Boulder(int startX, int startY, StudentWorld* world)
     : Actor(IID_BOULDER, startX, startY, down, 1.0, 1, world)
 {
@@ -416,32 +411,30 @@ Boulder::Boulder(int startX, int startY, StudentWorld* world)
     setVisible(true);
 }
 
-void Boulder::doSomething() { 
-    /* Implement Boulder behavior here */
+void Boulder::doSomething() {
     if (!isAlive()) { return; }
 
     if (_bState == 0) {
-        if (!getWorld()->Is_Ice(getX(), getY() - 1, GraphObject::down)) {
+        if (!getWorld()->Is_Ice(getX(), getY() - 1, down)) { 
             _bState = 1;
             _tick = 0;
         }
     }
-
     else if (_bState == 1 && _tick < 30) { _tick++; }
-
     else if (_bState == 1 && _tick == 30) {
         _bState = 2;
         GameController::getInstance().playSound(SOUND_FALLING_ROCK);
     }
-
     else if (_bState == 2) {
-        if (getWorld()->Can_Fall(getX(), getY() - 1)) {
+        int newY = getY() - 1;  
+        if (getWorld()->Can_Fall(getX(), getY()) - 1) {
             getWorld()->Set_Position(getX(), getY(), 0);
             moveTo(getX(), getY() - 1);
             getWorld()->Boulder_Annoyed(getX(), getY());
             getWorld()->Set_Position(getX(), getY(), 'B');
         }
-        else if (!getWorld()->Can_Fall(getX(), getY() - 1)) { setDead(); }
+        else if (!getWorld()->Can_Fall(getX(), getY() - 1))
+        { setDead(); }
     }
 }
 
@@ -453,8 +446,8 @@ Squirt::Squirt(int startX, int startY, Direction dir, StudentWorld* world)
     _sDistance = 0;
 }
 
-void Squirt::doSomething() { 
-    /* Implement Squirt behavior here */
+void Squirt::doSomething() {  
+
     if (getWorld()->Protester_Annoyed(getX(), getY(), 2)) { setDead(); }
     if (_sDistance == 4) { setDead();; }
 
@@ -509,8 +502,7 @@ Oil::Oil(int startX, int startY, StudentWorld* world)
     setVisible(false);
 }
 
-void Oil::doSomething() { 
-    /* Oil logic */
+void Oil::doSomething() {  
     if (!isAlive()) { return; }
 
 	// --- Reveal Oil Barrel Logic ---
@@ -560,7 +552,7 @@ void Gold::doSomething() {
             else { reduceTick(); }
         }
         else {
-            // setDead();
+            //setDead();
             // bribe the actor
         }
     }
