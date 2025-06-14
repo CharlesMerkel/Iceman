@@ -396,7 +396,7 @@ bool StudentWorld::inLineOfSightToPlayer(int x, int y, GraphObject::Direction& o
 	return false;
 }
 
-void StudentWorld::dropGold(int x, int y) { _actors.push_back(new Gold(x, y, this, true, true)); }
+void StudentWorld::dropGold(int x, int y) { _actors.push_back(new Gold(x, y, this, true, false)); }
 
 //  --- Game State & Level Progression ---
 
