@@ -1,12 +1,12 @@
 ﻿  Actor.cpp
   StudentWorld.cpp
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(300,54): warning C4244: 'argument': conversion from 'double' to 'const _Ty', possible loss of data
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(300,54): warning C4244:         with
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(300,54): warning C4244:         [
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(300,54): warning C4244:             _Ty=size_t
-C:\Users\charl\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(300,54): warning C4244:         ]
+C:\Users\josch\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(300,54): warning C4244: 'argument': conversion from 'double' to 'const _Ty', possible loss of data
+C:\Users\josch\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(300,54): warning C4244:         with
+C:\Users\josch\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(300,54): warning C4244:         [
+C:\Users\josch\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(300,54): warning C4244:             _Ty=unsigned int
+C:\Users\josch\source\repos\Iceman\IceMan\IceMan\StudentWorld.cpp(300,54): warning C4244:         ]
   GameController.cpp
   GameWorld.cpp
   main.cpp
   Generating Code...
-  IceMan.vcxproj -> C:\Users\charl\source\repos\Iceman\IceMan\Debug\IceMan.exe
+  IceMan.vcxproj -> C:\Users\josch\source\repos\Iceman\IceMan\Debug\IceMan.exe

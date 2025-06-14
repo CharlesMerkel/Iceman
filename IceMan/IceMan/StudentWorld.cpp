@@ -657,7 +657,7 @@ void StudentWorld::Sonar_Used(int x, int y) {
 		if (distSquared <= range) { actor->setVisible(true); }
 	}
 
-	// play sfx
+	GameController::getInstance().playSound(SOUND_SONAR);
 }
 
 //  - Misc Functions
@@ -686,8 +686,8 @@ bool StudentWorld::Remove_Ice_At(int x, int y)
 		if (_ptrIce[i] && _ptrIce[i]->getX() == x && _ptrIce[i]->getY() == y)
 		{
 			delete _ptrIce[i];
-			_ptrIce[i] = nullptr;
-			// play sound effect for ice removal
+			_ptrIce[i] = nullptr; 
+
 			return true;
 		}
 	}
