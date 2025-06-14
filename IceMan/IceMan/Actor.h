@@ -167,6 +167,8 @@ public:
 
     void moveInDirection(GraphObject::Direction dir);
     void chooseNewDirection();
+    int dyForDir(Direction dir) const;
+    int dxForDir(Direction dir) const;
 
 	void reduceShoutCooldown() { if (_shoutCooldown > 0) _shoutCooldown--; }
 	bool canShout() const { return _shoutCooldown <= 0; }

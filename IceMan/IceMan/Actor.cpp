@@ -127,22 +127,24 @@ Protester::Protester(int imageID, int startX, int startY, Direction dir, double 
     _restingTime = 0;
 	_numStepsInCurrentDirection = 0;
 	_currentDirection = getDirection(); // Initialize current direction
+
+    chooseNewDirection();
 }
 
 void Protester::doSomething()
 {
     if (!isAlive()) return;
 
-	// --- Resting Logic ---
+    // --- Resting Logic ---
     if (_restingTime > 0)
     {
         _restingTime--;
         return;
     }
 
-	reduceShoutCooldown(); // Reduce shout cooldown each tick
+    reduceShoutCooldown(); // Reduce shout cooldown each tick
 
-	// --- Leaving Field Logic ---
+    // --- Leaving Field Logic ---
     if (isLeavingField())
     {
         if (getX() == 60 && getY() == 60)
@@ -156,52 +158,67 @@ void Protester::doSomething()
         return;
     }
 
-	// --- Iceman Location Logic ---
+    // --- Iceman Location Logic ---
     int iceX = getWorld()->getIceman()->getX();
     int iceY = getWorld()->getIceman()->getY();
-	int dX = getX() - iceX;
-	int dY = getY() - iceY;
+    int dX = getX() - iceX;
+    int dY = getY() - iceY;
     double distance = sqrt(dX * dX + dY * dY);
 
-
-	// --- Shout Logic ---
+    // --- Shout Logic ---
     GraphObject::Direction dir;
-    if(distance<= 4.0 && getWorld()->inLineOfSightToPlayer(getX(),getY(), dir) && canShout())
+    if (distance <= 4.0 && getWorld()->inLineOfSightToPlayer(getX(), getY(), dir) && canShout())
     {
         setDirection(dir);
         getWorld()->playSound(SOUND_PROTESTER_YELL);
         getWorld()->getIceman()->annoy(2);
-        resetShoutCooldown(); // Reset shout cooldown
-		_restingTime = getWorld()->getRestTime(); // Set resting time after shouting
+        resetShoutCooldown();
+        _restingTime = getWorld()->getRestTime();
         return;
-	}
+    }
 
-	// --- Line of Sight Movement Logic ---
+    // --- Line of Sight Movement ---
     if (distance > 4.0 && getWorld()->inLineOfSightToPlayer(getX(), getY(), dir)) {
         setDirection(dir);
         if (getWorld()->canMoveTo(getX(), getY(), dir)) {
-            moveInDirection(dir);
+            moveTo(getX() + dxForDir(dir), getY() + dyForDir(dir));
             _restingTime = getWorld()->getRestTime();
             return;
         }
     }
 
-	// --- Random Movement Logic ---
+    // --- Random Movement ---
     if (_numStepsInCurrentDirection <= 0) {
-        chooseNewDirection();
+        chooseNewDirection(); // sets _currentDirection and _numStepsInCurrentDirection
     }
 
     if (getWorld()->canMoveTo(getX(), getY(), _currentDirection)) {
-		setDirection(_currentDirection); //makes sprite face the direction
-        moveInDirection(_currentDirection);
+        setDirection(_currentDirection);
+        moveTo(getX() + dxForDir(_currentDirection), getY() + dyForDir(_currentDirection));
         _numStepsInCurrentDirection--;
         _restingTime = getWorld()->getRestTime();
     }
     else {
-        _numStepsInCurrentDirection = 0; // Force to pick new direction next time
+        _numStepsInCurrentDirection = 0;
     }
 }
 
+// Helper function to get delta x for a direction
+int Protester::dxForDir(Direction dir) const {
+    switch (dir) {
+    case left: return -1;
+    case right: return 1;
+    default: return 0;
+    }
+}
+// Helper function to get delta y for a direction
+int Protester::dyForDir(Direction dir) const {
+    switch (dir) {
+    case up: return 1;
+    case down: return -1;
+    default: return 0;
+    }
+}
 void Protester::chooseNewDirection() 
 {
     GraphObject::Direction dirs[] = { up, down, left, right };
@@ -245,7 +262,6 @@ void Protester::die()
 void RegularProtester::doSomething()
 {
     Protester::doSomething(); // Extend or override behavior
-    // Additional logic for regular protester
 }
 
 void RegularProtester::die()

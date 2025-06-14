@@ -26,7 +26,8 @@ class StudentWorld : public GameWorld
 {
 public:
 	StudentWorld(std::string assetDir)
-		: GameWorld(assetDir), _iceman(nullptr) {
+		: GameWorld(assetDir), _iceman(nullptr) 
+	{
 		for (int x = 0; x < 64; ++x) {
 			for (int y = 0; y < 64; ++y) {
 				_actorPositions[x][y] = 0;
@@ -74,6 +75,7 @@ public:
 	// [ None of these inteactions work ]
 
 	Iceman* Iceman_ptr() { return _iceman; }
+	unsigned int getTicks() const { return _ticks; }
 
 	bool Near_Iceman(int x, int y, int actortype);
 	void Boulder_Annoyed(int x, int y);
@@ -100,6 +102,7 @@ private:
 	int _ticksForProtester;
 	int _t_LastProtester;
 	int _nProtesters = 0;
+	int _ticks = 0; // Ticks for the game world
 
 	char _actorPositions[64][64] = {};
 	std::list<Actor*> _actors; // List of actors in the game world

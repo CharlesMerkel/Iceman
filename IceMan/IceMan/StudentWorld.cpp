@@ -68,6 +68,7 @@ bool StudentWorld::No_Overlap(int x, int y) {
 int StudentWorld::init() {
 
 	SpawnIce();
+	_ticks = 0;
 	_ticksForProtester = _t_LastProtester = max<unsigned int>(25, 200 - getLevel());
 	_pickedBarrels = 0;
 	_nProtesters = 0;
@@ -143,7 +144,7 @@ int StudentWorld::init() {
 //        checks if the level is completed or if the player died to start the next map.
 int StudentWorld::move() {
 	Update_Display_Text();
-
+	_ticks++;
 	// --- Iceman Management ---
 	if(_iceman && _iceman->isAlive())
 	_iceman->doSomething(); //let the iceman act this tick
