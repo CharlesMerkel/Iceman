@@ -123,10 +123,12 @@ int StudentWorld::init() {
 
 	for (int i = 0; i < _Gold; i++){
 		int x = rand() % 61;
-		int y = rand() % 57;
+		int y = rand() % 37 + 20;
 
-		if (No_Overlap(x, y)){
-			_actors.push_back(new Gold(x, y, this, false, true));
+		if (No_Overlap(x, y)) {
+			Gold* gold = new Gold(x, y, this, false, true);
+			// gold->setType(ActorType::Gold);
+			_actors.push_back(gold);
 			Set_Position(x, y, 'G');
 		}
 
@@ -492,24 +494,44 @@ bool StudentWorld::Is_Boulder(int x, int y, GraphObject::Direction dir) const
 	return false;
 }
 
-//Is_Ice - Checks if there is ice at the given coordinates in a specified direction.
-bool StudentWorld::Is_Ice(int x, int y, GraphObject::Direction dir) const
-{
-	// Calculate the adjacent tile based on direction
-	switch (dir) {
-	case GraphObject::left:  x -= 1; break;
-	case GraphObject::right: x += 1; break;
-	case GraphObject::up:    y += 1; break;
-	case GraphObject::down:  y -= 1; break;
-	default: break;
+// Is_Ice - Checks if there is ice at the given coordinates in a specified direction.
+bool StudentWorld::Is_Ice(int x, int y, GraphObject::Direction dir) const {
+	switch (dir)
+	{
+	case GraphObject::down:
+		for (int i = 0; i < _NUMIce; i++)
+			if (_ptrIce[i] != nullptr){
+				if (_ptrIce[i]->getX() >= x && _ptrIce[i]->getX() <= x + 3 && _ptrIce[i]->getY() == y)
+				{ return true; }	
+			}
+		break;
+
+	case GraphObject::up:
+		for (int i = 0; i < _NUMIce; i++)
+			if (_ptrIce[i] != nullptr){
+				if (_ptrIce[i]->getX() >= x && _ptrIce[i]->getX() <= x + 3 && _ptrIce[i]->getY() == y + 3)
+				{ return true; }
+			}
+		break;
+
+	case GraphObject::right:
+		for (int i = 0; i < _NUMIce; i++)
+			if (_ptrIce[i] != nullptr){
+				if (_ptrIce[i]->getY() >= y && _ptrIce[i]->getY() <= y + 3 && _ptrIce[i]->getX() == x + 3)
+				{ return true; }
+			}
+		break;
+
+	case GraphObject::left:
+		for (int i = 0; i < _NUMIce; i++)
+			if (_ptrIce[i] != nullptr){
+				if (_ptrIce[i]->getY() >= y && _ptrIce[i]->getY() <= y + 3 && _ptrIce[i]->getX() == x)
+				{ return true; }
+			}
+		break;
 	}
-	// Check if there is ice at the new (x, y)
-	for (Ice* ice : _ptrIce) {
-		if (ice && ice->getX() == x && ice->getY() == y) {
-			return true; // Ice found at the specified coordinates
-		}
-	}
-	return false; // No ice found
+
+	return false;
 }
 
 // No_Ice_Or_Boulder - Checks if there is neither ice nor a boulder in a specified direction from given coordinates.
@@ -520,13 +542,11 @@ bool StudentWorld::No_Ice_Or_Boulder(int x, int y, GraphObject::Direction dir) c
 }
 
 // Can_Fall - Checks if an object at given coords can fall downward (Check if no ice or boulder below it).
-bool StudentWorld::Can_Fall(int x, int y) const
-{
-	// Check if there is ice or a boulder directly below the given coordinates
-	if (Is_Ice(x, y - 1, GraphObject::down) || Is_Boulder(x, y - 1, GraphObject::down)) {
-		return false; // Cannot fall if there is ice or a boulder below
-	}
-	return true; // Can fall if no ice or boulder below
+bool StudentWorld::Can_Fall(int x, int y) const {
+	if (y < 0) { return false; }
+	if (!No_Ice_Or_Boulder(x, y, GraphObject::down))
+	{ return false;}
+	return true;
 }
 
 // Can_Shout - Checks if the Iceman can be shouted at again.
