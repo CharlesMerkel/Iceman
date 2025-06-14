@@ -512,27 +512,8 @@ bool StudentWorld::Is_Ice(int x, int y, GraphObject::Direction dir) const
 	return false; // No ice found
 }
 
-//No_Ice_Or_Boulder - Checks if there is neither ice nor a boulder in a specified direction from given coordinates.
-bool StudentWorld::No_Ice_Or_Boulder(int x, int y, GraphObject::Direction dir) const
-{
-	// Calculate the adjacent tile based on direction
-	switch (dir) {
-	case GraphObject::left:  x -= 1; break;
-	case GraphObject::right: x += 1; break;
-	case GraphObject::up:    y += 1; break;
-	case GraphObject::down:  y -= 1; break;
-	default: break;
-	}
-	// Check for ice at the new (x, y)
-	if (Is_Ice(x, y, dir)) {
-		return false; // Ice found
-	}
-	// Check for boulders at the new (x, y)
-	if (Is_Boulder(x, y, dir)) {
-		return false; // Boulder found
-	}
-	return true; // Neither ice nor boulder found
-}
+// No_Ice_Or_Boulder - Checks if there is neither ice nor a boulder in a specified direction from given coordinates.
+
 
 // Can_Fall - Checks if an object at given coords can fall downward (Check if no ice or boulder below it).
 bool StudentWorld::Can_Fall(int x, int y) const
@@ -626,8 +607,18 @@ void StudentWorld::Boulder_Annoyed(int x, int y)
 // Protester_Annoyed - Allows the squirt object to damage protesters.
 bool StudentWorld::Protester_Annoyed(int x, int y, int dmg)
 {
-// Input Protester Damage 
-	return false; // Placeholder implementation, should be replaced with actual logic
+	bool rv = false;
+	std::vector<Actor*>::iterator it;
+	for (it = _actors.begin(); it != _actors.end(); it++)
+	{
+		if ((*it)->getX() >= x - 3 && (*it)->getX() <= x + 3 && (*it)->getY() >= y - 3 && (*it)->getY() <= y + 3)
+			if ((*it)->is_Protester() && (*it)->getState() != "leave-oil-field") {
+				(*it)->take_Damage(dmg);
+				rv = true;
+			}
+	}
+
+	return rv;
 }
 
 // Set_Position - Sets a 4x4 actor in a specified coordinate.

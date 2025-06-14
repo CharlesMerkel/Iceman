@@ -156,6 +156,9 @@ public:
     virtual void doSomething() override;
     virtual void die() override;
 
+    virtual bool is_Protester() { return true; }
+    virtual void take_Damage(int dmg) { ; }
+
     void setLeaveField(bool leave = true) { _leavingField = leave; }
     bool isLeavingField() const { return _leavingField; }
     
@@ -173,7 +176,7 @@ public:
 	void reduceShoutCooldown() { if (_shoutCooldown > 0) _shoutCooldown--; }
 	bool canShout() const { return _shoutCooldown <= 0; }
 	void resetShoutCooldown() { _shoutCooldown = 15; } // Reset to 15 ticks
-    virtual bool is_Protester() { return true; }
+
 protected:
     bool _leavingField = false;
     bool _stunned = false;
