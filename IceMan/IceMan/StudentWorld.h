@@ -64,6 +64,7 @@ public:
 	bool No_Ice_Or_Boulder(int x, int y, GraphObject::Direction dir) const;
 	bool Can_Fall(int x, int y) const;
 	bool Can_Shout() const;
+	std::vector<std::pair<int, int>> getPathToExit(int startX, int startY);
 
 	//  --- Game State & Level Progression ---
 

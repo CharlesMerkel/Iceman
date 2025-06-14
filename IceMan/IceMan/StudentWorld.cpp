@@ -655,6 +655,47 @@ bool StudentWorld::Protester_Annoyed(int x, int y, int dmg) {
 
 }
 
+std::vector<std::pair<int, int>> StudentWorld::getPathToExit(int startX, int startY) {
+	const int WIDTH = 64;
+	const int HEIGHT = 64;
+	bool visited[WIDTH][HEIGHT] = {};
+	std::pair<int, int> parent[WIDTH][HEIGHT];
+	std::queue<std::pair<int, int>> q;
+
+	q.push({ startX, startY });
+	visited[startX][startY] = true;
+
+	const int dirX[4] = { -1, 1, 0, 0 };
+	const int dirY[4] = { 0, 0, 1, -1 };
+
+	while (!q.empty()) {
+		auto [x, y] = q.front();
+		q.pop();
+		if (x == 60 && y == 60) break;
+
+		for (int d = 0; d < 4; ++d) {
+			int nx = x + dirX[d], ny = y + dirY[d];
+			if (nx >= 0 && ny >= 0 && nx < WIDTH && ny < HEIGHT &&
+				!visited[nx][ny] && canMoveTo(x, y, static_cast<GraphObject::Direction>(d))) {
+				visited[nx][ny] = true;
+				parent[nx][ny] = { x, y };
+				q.push({ nx, ny });
+			}
+		}
+	}
+
+	std::vector<std::pair<int, int>> path;
+	int x = 60, y = 60;
+	while (!(x == startX && y == startY)) {
+		path.push_back({ x, y });
+		auto p = parent[x][y];
+		x = p.first;
+		y = p.second;
+	}
+	std::reverse(path.begin(), path.end());
+	return path;
+}
+
 // Set_Position - Sets a 4x4 actor in a specified coordinate.
 bool StudentWorld::Set_Position(int x, int y, char actortype)
 {

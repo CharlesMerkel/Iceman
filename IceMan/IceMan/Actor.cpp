@@ -201,6 +201,11 @@ void Protester::doSomething()
         return;
     }
 
+    if (_restingTime == 0 && _stunned)
+    {
+        _stunned = false;
+    }
+
     reduceShoutCooldown(); // Reduce shout cooldown each tick
 
     // --- Leaving Field Logic ---
@@ -213,7 +218,23 @@ void Protester::doSomething()
             return;
         }
 
-        // TODO: Pathfinding to leave field (not yet implemented)
+        // Get path to exit
+        auto path = getWorld()->getPathToExit(getX(), getY());
+        if (!path.empty())
+        {
+            auto [nextX, nextY] = path.front();  // next tile
+            int dx = nextX - getX();
+            int dy = nextY - getY();
+
+            // Convert to direction
+            if (dx > 0) setDirection(GraphObject::right);
+            else if (dx < 0) setDirection(GraphObject::left);
+            else if (dy > 0) setDirection(GraphObject::up);
+            else if (dy < 0) setDirection(GraphObject::down);
+
+            moveTo(nextX, nextY);
+        }
+
         _restingTime = getWorld()->getRestTime();
         return;
     }
@@ -345,10 +366,10 @@ void Protester::die()
 {
     if (!isLeavingField())
     {
+        _stunned = false;
         setLeaveField(true);
         getWorld()->playSound(SOUND_PROTESTER_GIVE_UP);
         getWorld()->increaseScore(100);
-		// add pathing logic to exit the field
     }
 }
 

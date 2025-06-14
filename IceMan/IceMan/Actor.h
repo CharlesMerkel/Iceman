@@ -164,6 +164,7 @@ public:
 
     void setLeaveField(bool leave = true) { _leavingField = leave; }
     bool isLeavingField() const { return _leavingField; }
+    std::vector<std::pair<int, int>> _exitPath;
     
     void setStunned(bool stunned = true) { _stunned = stunned; }
     bool isStunned() const { return _stunned; }
