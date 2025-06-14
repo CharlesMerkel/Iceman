@@ -253,6 +253,7 @@ public:
     Oil(int startX, int startY, StudentWorld* world);
     virtual ActorType getType() const override { return ActorType::OilBarrel; }
     virtual void doSomething() override;
+	bool isPickedUp() const override { return !isAlive(); } // Override to indicate pickup state
 };
 
 class Gold : public PickUp

@@ -178,9 +178,9 @@ int StudentWorld::move() {
 		return GWSTATUS_PLAYER_DIED;
 	}
 	// --- Win conditions ---
-	/*if (Finished_Level()) {
+	if (Finished_Level()) {
 		return GWSTATUS_FINISHED_LEVEL;
-	}*/
+	}
 	Remove_Dead_Game_Objects();
 
 	return GWSTATUS_CONTINUE_GAME;
