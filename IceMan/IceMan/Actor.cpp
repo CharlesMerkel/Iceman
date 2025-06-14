@@ -490,7 +490,7 @@ void Oil::doSomething() {
     }
 }
 
-Gold::Gold(int startX, int startY, StudentWorld* world, bool isVisible, bool canpick)
+Gold::Gold(int startX, int startY, StudentWorld* world, bool isVisible = true, bool canpick = true)
     : PickUp(IID_GOLD, startX, startY, right, 1.0, 2, world) {
     setVisible(true);
     setPickup(true);

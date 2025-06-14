@@ -394,6 +394,8 @@ bool StudentWorld::inLineOfSightToPlayer(int x, int y, GraphObject::Direction& o
 	return false;
 }
 
+void StudentWorld::dropGold(int x, int y) { _actors.push_back(new Gold(x, y, this, true, true)); }
+
 //  --- Game State & Level Progression ---
 
 // Finished_Level - Returns true if the player picked up all the oil.

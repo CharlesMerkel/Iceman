@@ -84,8 +84,7 @@ public:
 	char Get_Position(int x, int y) const { return _actorPositions[x][y]; }
 	void Squirt_Water(int x, int y, GraphObject::Direction dir);
 	void Sonar_Used(int x, int y);
-	void dropGold(int x, int y)
-	{ _actors.push_back(new Gold(x, y, this, true, false)); }
+	void dropGold(int x, int y);
 
 	// --- Other/Misc functions ---
 	void SpawnIce();
