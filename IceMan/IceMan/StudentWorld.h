@@ -81,6 +81,7 @@ public:
 	bool Near_Iceman(int x, int y, int actortype);
 	void Boulder_Annoyed(int x, int y);
 	bool Protester_Annoyed(int x, int y, int dmg, int source);
+	bool Bribe_Nearby_Protester(int x, int y);
 	bool Set_Position(int x, int y, char actortype);
 	char Get_Position(int x, int y) const { return _actorPositions[x][y]; }
 	void Squirt_Water(int x, int y, GraphObject::Direction dir);

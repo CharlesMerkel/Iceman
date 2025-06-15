@@ -361,6 +361,14 @@ void Protester::annoy(int damage)
         _stunned = true;
     }
 }
+
+void Protester::bribe() {
+    getWorld()->playSound(SOUND_PROTESTER_FOUND_GOLD);
+    setLeaveField(true);
+    _stunned = false;
+    _restingTime = 0;
+}
+
 void Protester::die()
 {
     if (!isLeavingField())
@@ -554,40 +562,49 @@ void Oil::doSomething() {
     }
 }
 
-Gold::Gold(int startX, int startY, StudentWorld* world, bool isVisible = true, bool canpick = true)
-    : PickUp(IID_GOLD, startX, startY, right, 1.0, 2, world) {
+Gold::Gold(int startX, int startY, StudentWorld* world, bool isVisible, bool canpick, bool temporary)
+    : PickUp(IID_GOLD, startX, startY, right, 1.0, 2, world), _temporary(temporary)
+{
     setVisible(isVisible);
     setPickup(canpick);
-    setTick(100); 
+    if (_temporary)
+        setTick(100); // 100 ticks for temporary gold
+    else
+        setTick(-1);  // not used for permanent
 }
 
-void Gold::doSomething() { 
-    /* Gold logic */
-    if (!isAlive()) { return; }
+void Gold::doSomething() {
+    if (!isAlive()) return;
 
+    // Make visible if Iceman is nearby
     if (!isVisible() && getWorld()->Near_Iceman(getX(), getY(), 4)) {
         setVisible(true);
         return;
     }
 
-    if (isVisible() && getWorld()->Near_Iceman(getX(), getY(), 3)) {
-        setDead();
-        getWorld()->increaseScore(10);
-        getWorld()->Iceman_ptr()->goldAmmoIncrease();
-        GameController::getInstance().playSound(SOUND_GOT_GOODIE);
+    if (!_temporary) {
+        // Permanent gold: Iceman picks it up
+        if (isVisible() && getWorld()->Near_Iceman(getX(), getY(), 3)) {
+            setDead();
+            getWorld()->increaseScore(10);
+            getWorld()->Iceman_ptr()->goldAmmoIncrease();
+            GameController::getInstance().playSound(SOUND_GOT_GOODIE);
+        }
     }
-
-    else if (!isPickedUp()) {
-        std::vector<Actor*> protesters;
-        if (!protesters.empty()) {
-            if (getTick() == 0) { setDead(); }
-
-            else { reduceTick(); }
+    else {
+        // Temporary gold logic
+        if (getTick() <= 0) {
+            setDead();
+            return;
         }
-        else {
-            //setDead();
-            // bribe the actor
+
+        // Check for Protester to bribe
+        if (getWorld()->Bribe_Nearby_Protester(getX(), getY())) {
+            setDead();
+            return;
         }
+
+        reduceTick(); // Count down lifespan
     }
 }
 

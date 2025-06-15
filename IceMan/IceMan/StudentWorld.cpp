@@ -406,7 +406,7 @@ bool StudentWorld::inLineOfSightToPlayer(int x, int y, GraphObject::Direction& o
 	return false;
 }
 
-void StudentWorld::dropGold(int x, int y) { _actors.push_back(new Gold(x, y, this, true, false)); }
+void StudentWorld::dropGold(int x, int y) { _actors.push_back(new Gold(x, y, this, true, true, true)); }
 
 //  --- Game State & Level Progression ---
 
@@ -744,6 +744,26 @@ std::vector<std::pair<int, int>> StudentWorld::getPathToExit(int startX, int sta
 	}
 	std::reverse(path.begin(), path.end());
 	return path;
+}
+
+bool StudentWorld::Bribe_Nearby_Protester(int x, int y) {
+	for (Actor* actor : _actors) {
+		if (!actor || !actor->isAlive()) continue;
+
+		if (actor->getType() == ActorType::RegularProtester || actor->getType() == ActorType::HardcoreProtester) {
+			int dx = actor->getX() - x;
+			int dy = actor->getY() - y;
+			if (dx * dx + dy * dy <= 3 * 3) {
+				Protester* p = dynamic_cast<Protester*>(actor);
+				if (p && !p->isLeavingField()) {
+					p->bribe(); // Call custom bribe logic
+					increaseScore(25);
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }
 
 // Set_Position - Sets a 4x4 actor in a specified coordinate.

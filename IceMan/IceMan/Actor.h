@@ -187,6 +187,7 @@ public:
     void setStunned(bool stunned = true) { _stunned = stunned; }
     bool isStunned() const { return _stunned; }
 	void annoy(int amount);
+    void bribe();
 
     void setRestingTime(int time) { _restingTime = time; }
     int getRestingTime() const { return _restingTime; }
@@ -286,10 +287,13 @@ public:
 class Gold : public PickUp
 {
 public:
-    Gold(int startX, int startY, StudentWorld* world, bool isVisible, bool exists);
+    Gold(int startX, int startY, StudentWorld* world, bool isVisible, bool exits, bool temporary = false);
     virtual ActorType getType() const override { return ActorType::Gold; }
     virtual void doSomething() override;
     bool isPickedUp() const override { return !isAlive(); }
+
+private:
+	bool _temporary; //true if dropped by iceman, false if gold nugget
 };
 
 class Sonar : public PickUp
