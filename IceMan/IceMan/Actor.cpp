@@ -179,11 +179,13 @@ Protester::Protester(int imageID, int startX, int startY, Direction dir, double 
     _stunned = false;
 	_restingTime = 0;
 	_numStepsInCurrentDirection = 0;
-	_currentDirection = getDirection(); // Initialize current direction
 
     chooseNewDirection();
 }
-
+bool Protester::isAlive() const
+{
+    return HasHP::isAlive() || isLeavingField();
+}
 void Protester::doSomething()
 {
     if (!isAlive()) return;
@@ -191,10 +193,12 @@ void Protester::doSomething()
     // --- Resting Logic ---
     if (_restingTime > 0) {
         _restingTime--;
-        if (_restingTime == 0) {
-            _stunned = false;  //Reset stun after rest
+        if (_restingTime == 0)
+            _stunned = false;
+
+        if (!isLeavingField()) {
+            return;
         }
-        return;
     }
 
     if (_restingTime == 0 && _stunned)
@@ -205,6 +209,8 @@ void Protester::doSomething()
     reduceShoutCooldown(); // Reduce shout cooldown each tick
 
     // --- Leaving Field Logic ---
+
+    // Get path to exit
     if (isLeavingField())
     {
         if (getX() == 60 && getY() == 60)
@@ -213,24 +219,22 @@ void Protester::doSomething()
             setDead();
             return;
         }
-
-        // Get path to exit
         auto path = getWorld()->getPathToExit(getX(), getY());
-        if (!path.empty())
-        {
-            auto [nextX, nextY] = path.front();  // next tile
-            int dx = nextX - getX();
-            int dy = nextY - getY();
-
-            // Convert to direction
-            if (dx > 0) setDirection(GraphObject::right);
-            else if (dx < 0) setDirection(GraphObject::left);
-            else if (dy > 0) setDirection(GraphObject::up);
-            else if (dy < 0) setDirection(GraphObject::down);
-
-            moveTo(nextX, nextY);
+        if (path.empty()) {
+            _restingTime = getWorld()->getRestTime();
+            return;
         }
 
+        auto [nextX, nextY] = path.front();
+        int dx = nextX - getX();
+        int dy = nextY - getY();
+
+        if (dx > 0) setDirection(GraphObject::right);
+        else if (dx < 0) setDirection(GraphObject::left);
+        else if (dy > 0) setDirection(GraphObject::up);
+        else if (dy < 0) setDirection(GraphObject::down);
+
+        moveTo(nextX, nextY);
         _restingTime = getWorld()->getRestTime();
         return;
     }
@@ -345,11 +349,10 @@ void Protester::annoy(int damage)
     if (isLeavingField() || isStunned()) return;
 
     _health -= damage;
+
     if (_health <= 0)
     {
-        // Start leaving field
-        die();
-
+        die(); // Calls overridden die()
     }
     else
     {
@@ -362,10 +365,9 @@ void Protester::die()
 {
     if (!isLeavingField())
     {
-        _stunned = false;
         setLeaveField(true);
+        _stunned = false;
         getWorld()->playSound(SOUND_PROTESTER_GIVE_UP);
-        getWorld()->increaseScore(100);
     }
 }
 
@@ -377,8 +379,17 @@ void RegularProtester::doSomething()
 
 void RegularProtester::die()
 {
-    Protester::die();
-    // Maybe play sound, add score, etc.
+    if (getLastDamage() == DamageSource::Boulder)
+    {
+        getWorld()->increaseScore(500);
+        setVisible(false);
+        setDead(); // Instantly remove protester
+        return;
+    }
+
+    // Squirt or default case
+    getWorld()->increaseScore(100);
+    Protester::die(); // walk off field logic
 }
 
 // --- HardcoreProtestor ---
@@ -390,8 +401,16 @@ void HardcoreProtester::doSomething()
 
 void HardcoreProtester::die()
 {
+    if (getLastDamage() == DamageSource::Boulder)
+    {
+        getWorld()->increaseScore(1000); // If different value for hardcore
+        setVisible(false);
+        setDead();
+        return;
+    }
+
+    getWorld()->increaseScore(250); // Example squirt value for hardcore
     Protester::die();
-    // Different sound/score/etc
 }
 
 // --- Ice ---
@@ -448,7 +467,7 @@ Squirt::Squirt(int startX, int startY, Direction dir, StudentWorld* world)
 
 void Squirt::doSomething() {  
 
-    if (getWorld()->Protester_Annoyed(getX(), getY(), 2)) { setDead(); }
+    if (getWorld()->Protester_Annoyed(getX(), getY(), 2, static_cast<int>(HasHP::DamageSource::Squirt))) { setDead(); }
     if (_sDistance == 4) { setDead();; }
 
     else if (getDirection() == up) {

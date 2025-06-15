@@ -253,6 +253,7 @@ void StudentWorld::spawnPowerUps() {
 	//	}
 	//}
 }
+
 // Can_Face - Checks if the Actor can face the Iceman based off of its coordinates &
 //current direction, returns false if unable.
 bool StudentWorld::Can_Face(int x, int y, GraphObject::Direction& dir){
@@ -355,6 +356,15 @@ void StudentWorld::Remove_Dead_Game_Objects()
 		if (actor == _iceman) {
 			++it;
 			continue;
+		}
+
+		// If actor is a protester and still leaving field, skip
+		if (Protester* p = dynamic_cast<Protester*>(actor))
+		{
+			if (p->isLeavingField()) {
+				++it;
+				continue;
+			}
 		}
 
 		if (!actor->isAlive()) {
@@ -591,13 +601,32 @@ bool StudentWorld::canMoveTo(int x, int y, GraphObject::Direction dir) const
 	return true;
 }
 
+// Helper overload to allow position-only checks
+bool StudentWorld::canMoveTo(int x, int y) const
+{
+	// Reuse directional version by simulating "standing still" and moving into tile from above
+	// Picks a dummy direction that ends at (x, y)
+	// Reverse engineer: start = (x - dx, y - dy), dir = ?
+	// Try all 4 directions and see if they lead *to* (x, y)
+	for (GraphObject::Direction dir : {GraphObject::left, GraphObject::right, GraphObject::up, GraphObject::down}) {
+		int px = x, py = y;
+		switch (dir) {
+		case GraphObject::left:  px += 1; break;
+		case GraphObject::right: px -= 1; break;
+		case GraphObject::up:    py -= 1; break;
+		case GraphObject::down:  py += 1; break;
+		}
+		if (canMoveTo(px, py, dir)) return true;
+	}
+	return false;
+}
+
 int StudentWorld::getRestTime() const
 {
 	return std::max(0, static_cast<int>(3 - getLevel() / 4));
 }
 
 //  --- Gameplay & Interactions ---
-// [ None of these inteactions work ]
 
 // Near_Iceman - Checks if the Iceman is within a certain distance from a given coordinate.
 bool StudentWorld::Near_Iceman(int x, int y, int actortype) {
@@ -607,17 +636,20 @@ bool StudentWorld::Near_Iceman(int x, int y, int actortype) {
 	int distSqrt = dx * dx + dy * dy;
 	return distSqrt <= actortype * actortype;
 }
+
 // Boulder_Annoyed - Allows the boulder to 'damage' any actor.
 void StudentWorld::Boulder_Annoyed(int x, int y)
 {
 	if (_iceman->getX() >= x - 3 && _iceman->getX() <= x + 3 && _iceman->getY() >= y - 3 && _iceman->getY() <= y + 3)
 	{ _iceman->die(); }
 
-	Protester_Annoyed(x, y, 100);
+	Protester_Annoyed(x, y, 100, static_cast<int>(HasHP::DamageSource::Boulder));
 }
 
 // Protester_Annoyed - Allows the squirt object to damage protesters.
-bool StudentWorld::Protester_Annoyed(int x, int y, int dmg) {
+bool StudentWorld::Protester_Annoyed(int x, int y, int dmg, int sourceVal) {
+	HasHP::DamageSource source = static_cast<HasHP::DamageSource>(sourceVal);
+
 	for (Actor* actor : _actors)
 	{
 		if (!actor || !actor->isAlive())
@@ -633,6 +665,7 @@ bool StudentWorld::Protester_Annoyed(int x, int y, int dmg) {
 				Protester* p = dynamic_cast<Protester*>(actor);
 				if (p && !p->isStunned())
 				{
+					p->setLastDamage(source);
 					p->annoy(dmg); // Deal damage and auto-stun
 					return true;
 				}
@@ -646,8 +679,8 @@ bool StudentWorld::Protester_Annoyed(int x, int y, int dmg) {
 std::vector<std::pair<int, int>> StudentWorld::getPathToExit(int startX, int startY) {
 	const int WIDTH = 64;
 	const int HEIGHT = 64;
-	bool visited[WIDTH][HEIGHT] = {};
-	std::pair<int, int> parent[WIDTH][HEIGHT];
+	std::vector<std::vector<bool>> visited(WIDTH, std::vector<bool>(HEIGHT, false));
+	std::vector<std::vector<std::pair<int, int>>> parent(WIDTH, std::vector<std::pair<int, int>>(HEIGHT));
 	std::queue<std::pair<int, int>> q;
 
 	q.push({ startX, startY });
@@ -663,8 +696,11 @@ std::vector<std::pair<int, int>> StudentWorld::getPathToExit(int startX, int sta
 
 		for (int d = 0; d < 4; ++d) {
 			int nx = x + dirX[d], ny = y + dirY[d];
+
 			if (nx >= 0 && ny >= 0 && nx < WIDTH && ny < HEIGHT &&
-				!visited[nx][ny] && canMoveTo(x, y, static_cast<GraphObject::Direction>(d))) {
+				!visited[nx][ny] &&
+				canMoveTo(nx, ny))  //Only go to valid tiles
+			{
 				visited[nx][ny] = true;
 				parent[nx][ny] = { x, y };
 				q.push({ nx, ny });
@@ -674,6 +710,8 @@ std::vector<std::pair<int, int>> StudentWorld::getPathToExit(int startX, int sta
 
 	std::vector<std::pair<int, int>> path;
 	int x = 60, y = 60;
+	if (!visited[x][y]) return path; // No path
+
 	while (!(x == startX && y == startY)) {
 		path.push_back({ x, y });
 		auto p = parent[x][y];
@@ -714,7 +752,7 @@ void StudentWorld::Sonar_Used(int x, int y) {
 	GameController::getInstance().playSound(SOUND_SONAR);
 }
 
-//  - Misc Functions
+//  --- Misc Functions ---
 
 // Ice Functions
 // Spawn_Ice - Spawns ice in the grid, ensuring that the tunnel space is not filled with ice.

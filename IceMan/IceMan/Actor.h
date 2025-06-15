@@ -99,18 +99,27 @@ public:
     virtual ~HasHP() = default;
 
     void decreaseHealth(int amount); 
-    bool isAlive() const;
+    virtual bool isAlive() const;
 
     void setHealth(int health) { _health = health; }
 
+    enum class DamageSource {
+        Unknown,
+        Squirt,
+        Boulder
+    };
     virtual void setDead()
     {
         Actor::setDead();
         setHealth(0);
     }
+    // -- damage source checking --
+    void setLastDamage(DamageSource source) { _lastDamage = source; }
+    DamageSource getLastDamage() const { return _lastDamage; }
 
 protected:
     virtual void die() = 0;
+    DamageSource _lastDamage = DamageSource::Unknown; // used to track the last damage source
     int _health;
 };
 
@@ -168,6 +177,8 @@ public:
 
     virtual bool is_Protester() { return true; }
     virtual void take_Damage(int dmg) { ; }
+    bool virtual isAlive() const override;
+
 
     void setLeaveField(bool leave = true) { _leavingField = leave; }
     bool isLeavingField() const { return _leavingField; }
@@ -196,6 +207,7 @@ protected:
 	int _shoutCooldown = 0; // Cooldown for shouting
 	int _numStepsInCurrentDirection = 0; // Steps in the current directionq
 	GraphObject::Direction _currentDirection; // Current direction of the protester
+
 };
 
 // --- Regular Protester ---

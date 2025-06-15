@@ -55,10 +55,11 @@ public:
 	void New_Direction();
 	Iceman* getIceman() const { return _iceman; }
 	bool inLineOfSightToPlayer(int x, int y, GraphObject::Direction& outDir) const;
-	bool canMoveTo(int x, int y, GraphObject::Direction dir) const;
 	void spawnPowerUps();
 
 	// --- Collision and Movement ---
+	bool canMoveTo(int x, int y, GraphObject::Direction dir) const;
+	bool canMoveTo(int x, int y) const; //overloaded helper function
 	bool Is_Boulder(int x, int y, GraphObject::Direction dir) const;
 	bool Is_Ice(int x, int y, GraphObject::Direction dir) const;
 	bool No_Ice_Or_Boulder(int x, int y, GraphObject::Direction dir) const;
@@ -79,7 +80,7 @@ public:
 
 	bool Near_Iceman(int x, int y, int actortype);
 	void Boulder_Annoyed(int x, int y);
-	bool Protester_Annoyed(int x, int y,int dmg);
+	bool Protester_Annoyed(int x, int y, int dmg, int source);
 	bool Set_Position(int x, int y, char actortype);
 	char Get_Position(int x, int y) const { return _actorPositions[x][y]; }
 	void Squirt_Water(int x, int y, GraphObject::Direction dir);
