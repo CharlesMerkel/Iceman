@@ -379,19 +379,20 @@ void RegularProtester::doSomething()
 
 void RegularProtester::die()
 {
-    if (getLastDamage() == DamageSource::Boulder)
-    {
-        getWorld()->increaseScore(500);
-        setVisible(false);
-        setDead(); // Instantly remove protester
-        return;
+    if (!isLeavingField()) {
+        switch (getLastDamage()) {
+        case DamageSource::Boulder:
+            getWorld()->increaseScore(500);
+            break;
+        case DamageSource::Squirt:
+        default:
+            getWorld()->increaseScore(100);
+            break;
+        }
     }
 
-    // Squirt or default case
-    getWorld()->increaseScore(100);
-    Protester::die(); // walk off field logic
+    Protester::die();  // Always call to trigger exit behavior
 }
-
 // --- HardcoreProtestor ---
 void HardcoreProtester::doSomething()
 {
@@ -401,16 +402,19 @@ void HardcoreProtester::doSomething()
 
 void HardcoreProtester::die()
 {
-    if (getLastDamage() == DamageSource::Boulder)
-    {
-        getWorld()->increaseScore(1000); // If different value for hardcore
-        setVisible(false);
-        setDead();
-        return;
+    if (!isLeavingField()) {
+        switch (getLastDamage()) {
+        case DamageSource::Boulder:
+            getWorld()->increaseScore(1000);
+            break;
+        case DamageSource::Squirt:
+        default:
+            getWorld()->increaseScore(250);
+            break;
+        }
     }
 
-    getWorld()->increaseScore(250); // Example squirt value for hardcore
-    Protester::die();
+    Protester::die();  // Always call to trigger exit behavior
 }
 
 // --- Ice ---
