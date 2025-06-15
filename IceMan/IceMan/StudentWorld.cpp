@@ -135,8 +135,8 @@ int StudentWorld::init() {
 		else { i--; }
 	}
 
-	// Spawn a RegularProtester
-	_actors.push_back(new RegularProtester(this));
+	// Spawn a RegularProtester [ MOVED to move() ]
+	// _actors.push_back(new RegularProtester(this));
 
 	return GWSTATUS_CONTINUE_GAME;
 }
@@ -153,6 +153,18 @@ int StudentWorld::move() {
 
 	// --- Power Up Management ---
 	spawnPowerUps();
+
+	// --- Spawn Protesters ---
+	int rngHCProtester = min<unsigned int>(90, getLevel() * 10 + 30);
+	int G = getLevel() * 25 + 300;
+
+	if (Can_Add_Protester()) {
+		int n = rand() % 100 + 1;
+		if (n <= rngHCProtester)
+		{ _actors.push_back(new HardcoreProtester(this)); }
+		else
+		{ _actors.push_back(new RegularProtester(this)); }
+	}
 
 	// --- Actor Management ---
 	for (auto it = _actors.begin(); it != _actors.end(); ++it) 
