@@ -218,7 +218,7 @@ public:
     RegularProtester(StudentWorld* world)
         : Protester(IID_PROTESTER, 60, 60, left, 1.0, 0, world)
     {
-        // Customize starting position or behavior as needed
+        _health = 5;
     }
     virtual ActorType getType() const override { return ActorType::RegularProtester; }
     virtual void doSomething() override;
@@ -232,6 +232,7 @@ public:
     HardcoreProtester(StudentWorld* world)
         : Protester(IID_HARD_CORE_PROTESTER, 60, 60, left, 1.0, 0, world)
     {
+		_health = 20;
         // Customize starting position or behavior as needed
     }
     virtual ActorType getType() const override { return ActorType::HardcoreProtester; }
