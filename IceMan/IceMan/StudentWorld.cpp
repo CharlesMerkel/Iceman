@@ -541,9 +541,33 @@ bool StudentWorld::No_Ice_Or_Boulder(int x, int y, GraphObject::Direction dir) c
 
 // Can_Fall - Checks if an object at given coords can fall downward (Check if no ice or boulder below it).
 bool StudentWorld::Can_Fall(int x, int y) const {
-	if (y < 0) { return false; }
-	if (!No_Ice_Or_Boulder(x, y, GraphObject::down))
-	{ return false; }
+	int belowY = y - 1;
+
+	if (belowY < 0) return false;  // Can't fall off screen
+
+	// Check for ICE one row below the 4x4 block
+	for (int ix = x; ix < x + 4; ix++) {
+		for (int iy = belowY; iy < belowY + 1; iy++) {
+			for (Ice* ice : _ptrIce) {
+				if (!ice || !ice->isAlive()) continue;
+				if (ice->getX() == ix && ice->getY() == iy)
+					return false;
+			}
+		}
+	}
+
+	// Check for another BOULDER directly below
+	for (Actor* actor : _actors) {
+		if (!actor || !actor->isAlive()) continue;
+		if (actor->getType() != ActorType::Boulder) continue;
+
+		int ax = actor->getX();
+		int ay = actor->getY();
+
+		if (ax < x + 4 && ax + 4 > x && ay < y && ay + 4 > belowY)
+			return false;
+	}
+
 	return true;
 }
 

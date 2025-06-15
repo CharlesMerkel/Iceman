@@ -431,32 +431,42 @@ Boulder::Boulder(int startX, int startY, StudentWorld* world)
 }
 
 void Boulder::doSomething() {
-    if (!isAlive()) { return; }
+    if (!isAlive())
+        return;
 
     if (_bState == 0) {
-        if (!getWorld()->Is_Ice(getX(), getY() - 1, down)) { 
+        // Check if there’s no ice under it anymore
+        if (!getWorld()->Is_Ice(getX(), getY() - 1, GraphObject::down)) {
             _bState = 1;
             _tick = 0;
         }
     }
-    else if (_bState == 1 && _tick < 30) { _tick++; }
-    else if (_bState == 1 && _tick == 30) {
-        _bState = 2;
-        GameController::getInstance().playSound(SOUND_FALLING_ROCK);
+    else if (_bState == 1) {
+        // Wait 30 ticks before falling
+        if (_tick < 30) {
+            _tick++;
+        }
+        else {
+            _bState = 2;
+            GameController::getInstance().playSound(SOUND_FALLING_ROCK);
+        }
     }
     else if (_bState == 2) {
-        int newY = getY() - 1;  
-        if (getWorld()->Can_Fall(getX(), getY()) - 1) {
-            getWorld()->Set_Position(getX(), getY(), 0);
-            moveTo(getX(), getY() - 1);
-            getWorld()->Boulder_Annoyed(getX(), getY());
-            getWorld()->Set_Position(getX(), getY(), 'B');
+        int belowY = getY() - 1;
+
+        if (getWorld()->Can_Fall(getX(), getY())) {
+            getWorld()->Set_Position(getX(), getY(), 0);  // Clear current pos
+            if (getY() <= 0) { setDead(); }
+            moveTo(getX(), belowY);  // Move down
+            getWorld()->Boulder_Annoyed(getX(), belowY);  // Check for protester damage
+            getWorld()->Set_Position(getX(), belowY, 'B');  // Mark new pos
         }
-        else if (!getWorld()->Can_Fall(getX(), getY() - 1))
-        { setDead(); }
+        else {
+            // Can’t fall anymore, go poof
+            setDead();
+        }
     }
 }
-
 // --- Squirt ---
 Squirt::Squirt(int startX, int startY, Direction dir, StudentWorld* world)
     : Actor(IID_WATER_SPURT, startX, startY, dir, 1.0, 1, world)
