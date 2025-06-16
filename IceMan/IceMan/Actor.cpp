@@ -421,6 +421,7 @@ void RegularProtester::die()
 
     Protester::die();  // Always call to trigger exit behavior
 }
+
 // --- HardcoreProtestor ---
 void HardcoreProtester::doSomething()
 {

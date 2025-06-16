@@ -841,7 +841,7 @@ void StudentWorld::computePathsToPlayer()
 			int nx = x + dx;
 			int ny = y + dy;
 
-			// Use grid bounds check (VIEW_WIDTH and VIEW_HEIGHT are typically 64)
+			// Use grid bounds check
 			if (nx >= 0 && nx < VIEW_WIDTH && ny >= 0 && ny < VIEW_HEIGHT &&
 				!_visited[nx][ny] && canMoveTo(nx, ny)) {
 
