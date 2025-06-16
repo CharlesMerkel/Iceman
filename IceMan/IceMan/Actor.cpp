@@ -3,6 +3,12 @@
 #include <random>
 using namespace std;
 
+int randInt(int min, int max) {
+    static random_device rd;
+    static mt19937 gen(rd());
+    uniform_int_distribution<> dis(min, max);
+    return dis(gen);
+}
 
 // --- Actor ---
 Actor::Actor(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world)
@@ -182,6 +188,7 @@ Protester::Protester(int imageID, int startX, int startY, Direction dir, double 
 
     chooseNewDirection();
 }
+
 bool Protester::isAlive() const
 {
     return HasHP::isAlive() || isLeavingField();
@@ -216,23 +223,31 @@ void Protester::doSomething()
         if (getX() == 60 && getY() == 60)
         {
             setVisible(false);
+            setReachedExit(true);
             setDead();
             return;
         }
-        auto path = getWorld()->getPathToExit(getX(), getY());
-        if (path.empty()) {
+
+        // Only compute the path once
+        if (_exitPath.empty())
+            _exitPath = getWorld()->getPathToExit(getX(), getY());
+
+        if (_exitPath.empty()) {
             _restingTime = getWorld()->getRestTime();
             return;
         }
 
-        auto [nextX, nextY] = path.front();
+        // Get next step in path
+        auto [nextX, nextY] = _exitPath.front();
+        _exitPath.erase(_exitPath.begin());  // Move to next step next tick
+
+        // Set direction to face movement
         int dx = nextX - getX();
         int dy = nextY - getY();
-
-        if (dx > 0) setDirection(GraphObject::right);
-        else if (dx < 0) setDirection(GraphObject::left);
-        else if (dy > 0) setDirection(GraphObject::up);
-        else if (dy < 0) setDirection(GraphObject::down);
+        if (dx > 0) setDirection(right);
+        else if (dx < 0) setDirection(left);
+        else if (dy > 0) setDirection(up);
+        else if (dy < 0) setDirection(down);
 
         moveTo(nextX, nextY);
         _restingTime = getWorld()->getRestTime();
@@ -385,6 +400,11 @@ void RegularProtester::doSomething()
     Protester::doSomething(); // Extend or override behavior
 }
 
+void RegularProtester::bribe() 
+{
+	Protester::bribe(); // Call base class bribe logic
+}
+
 void RegularProtester::die()
 {
     if (!isLeavingField()) {
@@ -404,8 +424,181 @@ void RegularProtester::die()
 // --- HardcoreProtestor ---
 void HardcoreProtester::doSomething()
 {
-    Protester::doSomething();
-    // More aggressive pathfinding or resistance logic here
+    if (!isAlive()) return;
+
+    // --- Resting ---
+    if (getRestingTime() > 0) {
+        setRestingTime(getRestingTime() - 1);
+        if (getRestingTime() == 0) {
+            setStunned(false);
+			_cachedPath.clear(); // Clear cached path when resting ends
+        }
+        return;
+    }
+
+    int currTick = getWorld()->getTicks();
+
+    // --- Leaving ---
+    if (isLeavingField())
+    {
+        if (getX() == 60 && getY() == 60)
+        {
+            setReachedExit(true);
+            setVisible(false);
+            setDead();
+            return;
+        }
+
+        // Only compute the path once
+        if (_exitPath.empty())
+            _exitPath = getWorld()->getPathToExit(getX(), getY());
+
+        if (_exitPath.empty()) {
+            _restingTime = getWorld()->getRestTime();
+            return;
+        }
+
+        // Get next step in path
+        auto [nextX, nextY] = _exitPath.front();
+        _exitPath.erase(_exitPath.begin());  // Move to next step next tick
+
+        // Set direction to face movement
+        int dx = nextX - getX();
+        int dy = nextY - getY();
+        if (dx > 0) setDirection(right);
+        else if (dx < 0) setDirection(left);
+        else if (dy > 0) setDirection(up);
+        else if (dy < 0) setDirection(down);
+
+        moveTo(nextX, nextY);
+        _restingTime = getWorld()->getRestTime();
+        return;
+    }
+
+    // --- Iceman Detection ---
+    int iceX = getWorld()->getIceman()->getX();
+    int iceY = getWorld()->getIceman()->getY();
+    int dX = getX() - iceX;
+    int dY = getY() - iceY;
+    double distance = sqrt(dX * dX + dY * dY);
+    GraphObject::Direction dir;
+
+    // --- Shout Logic ---
+    if (distance <= 4.0 && getWorld()->inLineOfSightToPlayer(getX(), getY(), dir))
+    {
+        if (canShout())
+        {
+            if (getDirection() != dir)
+                setDirection(dir);
+
+            getWorld()->playSound(SOUND_PROTESTER_YELL);
+            getWorld()->getIceman()->annoy(2);
+            resetShoutCooldown();
+            _restingTime = getWorld()->getRestTime();
+            return;
+        }
+
+        // If can't shout yet, don't move through Iceman
+        return;
+    }
+
+    // --- Line-of-Sight Movement (toward Iceman) ---
+    if (getWorld()->inLineOfSightToPlayer(getX(), getY(), dir))
+    {
+        setDirection(dir);
+        if (getWorld()->canMoveTo(getX(), getY(), dir))
+        {
+            moveTo(getX() + dxForDir(dir), getY() + dyForDir(dir));
+            _restingTime = getWorld()->getRestTime();
+            return;
+        }
+        _cachedPath.clear();
+    }
+
+	// --- Path to Iceman ---
+    int M = 16 + getWorld()->getLevel() * 2;
+    if (_cachedPath.empty() || currTick - _lastPathUpdateTick >= 8) {
+        _cachedPath = getWorld()->getPathToTarget(getX(), getY(), iceX, iceY);
+        _lastPathUpdateTick = currTick;
+    }
+
+    // Re-check again to be safe
+    if (!_cachedPath.empty() && (int)_cachedPath.size() <= M) {
+        auto [nextX, nextY] = _cachedPath.front();
+        _cachedPath.erase(_cachedPath.begin());
+
+        GraphObject::Direction moveDir;
+        if (nextX > getX()) moveDir = right;
+        else if (nextX < getX()) moveDir = left;
+        else if (nextY > getY()) moveDir = up;
+        else moveDir = down;
+
+        if (getWorld()->canMoveTo(getX(), getY(), moveDir)) {
+            setDirection(moveDir);
+            moveTo(nextX, nextY);
+            _restingTime = getWorld()->getRestTime();
+            return;
+        }
+    }
+
+    // --- Random Movement ---
+    if (_numStepsInCurrentDirection <= 0)
+    {
+        chooseNewDirection();
+    }
+
+	// -- Perpendicular Movement --
+    if (currTick - _lastPerpendicularTurnTick >= 200) {
+        std::vector<GraphObject::Direction> viableDirs;
+        GraphObject::Direction currDir = getDirection();
+
+        if (currDir == left || currDir == right) {
+            if (getWorld()->canMoveTo(getX(), getY(), up)) viableDirs.push_back(up);
+            if (getWorld()->canMoveTo(getX(), getY(), down)) viableDirs.push_back(down);
+        }
+        else if (currDir == up || currDir == down) {
+            if (getWorld()->canMoveTo(getX(), getY(), left)) viableDirs.push_back(left);
+            if (getWorld()->canMoveTo(getX(), getY(), right)) viableDirs.push_back(right);
+        }
+
+        if (!viableDirs.empty()) {
+            int r = randInt(0, (int)viableDirs.size() - 1);
+            GraphObject::Direction newDir = viableDirs[r];
+            setDirection(newDir);
+            _currentDirection = newDir;
+            _numStepsInCurrentDirection = randInt(8, 60);
+            _lastPerpendicularTurnTick = currTick;
+
+            if (getWorld()->canMoveTo(getX(), getY(), newDir)) {
+                moveTo(getX() + dxForDir(newDir), getY() + dyForDir(newDir));
+                _numStepsInCurrentDirection--;
+                _restingTime = getWorld()->getRestTime();
+                return;
+            }
+        }
+    }
+
+	// --- Move in current direction one step ---
+    if (getWorld()->canMoveTo(getX(), getY(), _currentDirection)) 
+    {
+        setDirection(_currentDirection);
+        moveTo(getX() + dxForDir(_currentDirection), getY() + dyForDir(_currentDirection));
+        _numStepsInCurrentDirection--;
+        setRestingTime(getWorld()->getRestTime());
+    }
+	// --- If can't move in current direction, reset step count ---
+    else
+    {
+        _numStepsInCurrentDirection = 0;
+    }
+}
+
+void HardcoreProtester::bribe() 
+{
+    setStunned(true);
+    _cachedPath.clear();
+    setRestingTime(50);
+    getWorld()->playSound(SOUND_PROTESTER_FOUND_GOLD);
 }
 
 void HardcoreProtester::die()
@@ -414,6 +607,11 @@ void HardcoreProtester::die()
         switch (getLastDamage()) {
         case DamageSource::Boulder:
             getWorld()->increaseScore(1000);
+            break;
+        case DamageSource::Gold:
+            getWorld()->increaseScore(250);
+            _stunned = true;
+            _restingTime = std::max(50u, static_cast<unsigned int>(100 - getWorld()->getLevel() * 10));
             break;
         case DamageSource::Squirt:
         default:
@@ -577,14 +775,16 @@ void Gold::doSomething() {
     if (!isAlive()) return;
 
     // Make visible if Iceman is nearby
-    if (!isVisible() && getWorld()->Near_Iceman(getX(), getY(), 4)) {
+    if (!isVisible() && getWorld()->Near_Iceman(getX(), getY(), 4)) 
+    {
         setVisible(true);
         return;
     }
 
     if (!_temporary) {
         // Permanent gold: Iceman picks it up
-        if (isVisible() && getWorld()->Near_Iceman(getX(), getY(), 3)) {
+        if (isVisible() && getWorld()->Near_Iceman(getX(), getY(), 3)) 
+        {
             setDead();
             getWorld()->increaseScore(10);
             getWorld()->Iceman_ptr()->goldAmmoIncrease();
@@ -598,13 +798,22 @@ void Gold::doSomething() {
             return;
         }
 
-        // Check for Protester to bribe
-        if (getWorld()->Bribe_Nearby_Protester(getX(), getY())) {
-            setDead();
+        Protester* p = getWorld()->Bribe_Nearby_Protester(getX(), getY());
+        if (p) {
+            if (p->getType() == ActorType::RegularProtester) {
+                p->bribe();  // Regular protester leaves field
+                getWorld()->increaseScore(25);
+                setDead();
+            }
+            else if (p->getType() == ActorType::HardcoreProtester) {
+                p->bribe();  // Hardcore protester pauses temporarily
+                getWorld()->increaseScore(50);
+                setDead();
+            }
             return;
         }
 
-        reduceTick(); // Count down lifespan
+        reduceTick();
     }
 }
 

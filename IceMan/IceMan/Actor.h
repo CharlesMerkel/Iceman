@@ -106,6 +106,7 @@ public:
     enum class DamageSource {
         Unknown,
         Squirt,
+        Gold,
         Boulder
     };
     virtual void setDead()
@@ -171,7 +172,10 @@ class Protester : public HasHP
 public:
     Protester(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world);
 
-    virtual ~Protester() = default;
+    virtual~Protester()
+    {
+        _exitPath.clear(); // Clear exit path on destruction
+    }
     virtual void doSomething() override;
     virtual void die() override;
 
@@ -187,7 +191,7 @@ public:
     void setStunned(bool stunned = true) { _stunned = stunned; }
     bool isStunned() const { return _stunned; }
 	void annoy(int amount);
-    void bribe();
+    virtual void bribe();
 
     void setRestingTime(int time) { _restingTime = time; }
     int getRestingTime() const { return _restingTime; }
@@ -196,7 +200,8 @@ public:
     void chooseNewDirection();
     int dyForDir(Direction dir) const;
     int dxForDir(Direction dir) const;
-
+	bool hasReachedExit() const { return _reachedExit; }
+	void setReachedExit(bool val) { _reachedExit = val; }
 	void reduceShoutCooldown() { if (_shoutCooldown > 0) _shoutCooldown--; }
 	bool canShout() const { return _shoutCooldown <= 0; }
 	void resetShoutCooldown() { _shoutCooldown = 15; } // Reset to 15 ticks
@@ -208,6 +213,7 @@ protected:
 	int _shoutCooldown = 0; // Cooldown for shouting
 	int _numStepsInCurrentDirection = 0; // Steps in the current directionq
 	GraphObject::Direction _currentDirection; // Current direction of the protester
+	bool _reachedExit = false; // Flag to indicate if the protester has reached the exit
 
 };
 
@@ -220,7 +226,12 @@ public:
     {
         _health = 5;
     }
+    ~RegularProtester()
+    {
+		_exitPath.clear(); // Clear exit path on destruction
+	}
     virtual ActorType getType() const override { return ActorType::RegularProtester; }
+	void bribe() override; // Override but just call base class
     virtual void doSomething() override;
     virtual void die() override;
 };
@@ -235,9 +246,19 @@ public:
 		_health = 20;
         // Customize starting position or behavior as needed
     }
+    ~HardcoreProtester()
+    {
+        _exitPath.clear();
+        _cachedPath.clear(); // Clear cached path for Hardcore Protester
+    }
     virtual ActorType getType() const override { return ActorType::HardcoreProtester; }
+	void bribe() override; // Override to handle bribing differently
     virtual void doSomething() override;
     virtual void die() override;
+private:
+    int _lastPerpendicularTurnTick = -9999;
+    int _lastPathUpdateTick = -1;
+    std::vector<std::pair<int, int>> _cachedPath;
 };
 
 // --- Pickups ---

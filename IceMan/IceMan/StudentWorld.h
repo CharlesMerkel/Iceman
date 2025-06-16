@@ -16,7 +16,7 @@
 class Actor;
 class Ice;
 class Iceman;
-class Protestor;
+class Protester;
 // Students:  Add code to this file, StudentWorld.cpp, Actor.h, and Actor.cpp
 
 // This file basically calls all the functions listed in StudentWorld.cpp
@@ -66,6 +66,10 @@ public:
 	bool Can_Fall(int x, int y) const;
 	bool Can_Shout() const;
 	std::vector<std::pair<int, int>> getPathToExit(int startX, int startY);
+	std::vector<std::pair<int, int>> getPathToTarget(int startX, int startY, int goalX, int goalY);
+	std::vector<std::pair<int, int>> computePathFromTo(int startX, int startY, int goalX, int goalY);
+	void computePathsToPlayer();
+	void resetPathCache();
 
 	//  --- Game State & Level Progression ---
 
@@ -81,7 +85,7 @@ public:
 	bool Near_Iceman(int x, int y, int actortype);
 	void Boulder_Annoyed(int x, int y);
 	bool Protester_Annoyed(int x, int y, int dmg, int source);
-	bool Bribe_Nearby_Protester(int x, int y);
+	Protester* Bribe_Nearby_Protester(int x, int y);
 	bool Set_Position(int x, int y, char actortype);
 	char Get_Position(int x, int y) const { return _actorPositions[x][y]; }
 	void Squirt_Water(int x, int y, GraphObject::Direction dir);
@@ -109,6 +113,10 @@ private:
 
 	char _actorPositions[64][64] = {};
 	std::list<Actor*> _actors; // List of actors in the game world
+
+	std::vector<std::vector<std::pair<int, int>>> _cameFrom;
+	std::vector<std::vector<bool>> _visited;
+	bool _pathToPlayerComputed = false;
 };
 
 #endif // STUDENTWORLD_H_

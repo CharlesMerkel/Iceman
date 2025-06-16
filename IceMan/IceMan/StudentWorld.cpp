@@ -147,6 +147,9 @@ int StudentWorld::init() {
 int StudentWorld::move() {
 	Update_Display_Text();
 	_ticks++;
+
+	_pathToPlayerComputed = false;
+
 	// --- Iceman Management ---
 	if(_iceman && _iceman->isAlive())
 	_iceman->doSomething(); //let the iceman act this tick
@@ -167,6 +170,8 @@ int StudentWorld::move() {
 	}
 
 	// --- Actor Management ---
+	if (!_pathToPlayerComputed) { computePathsToPlayer(); }
+
 	for (auto it = _actors.begin(); it != _actors.end(); ++it) 
 	{
 		Actor* a = *it;
@@ -174,18 +179,16 @@ int StudentWorld::move() {
 		if (!a || !a->isAlive())
 			continue;
 
-		// Catch any unexpected issues in actor logic
 		try {
 			a->doSomething();
 		}
 		catch (...) {
-			// Safely kill problematic actor and avoid repeated crash
 			a->setDead();
-
-			// Optional: Set game stat text for debugging (since you can't see console)
-			setGameStatText("Error: Actor crash in doSomething()");
 		}
 	}
+
+	// --- Cleanup: Remove dead actors ---
+	Remove_Dead_Game_Objects();
 
 	// --- Lose conditions ---
 	if (_iceman && !_iceman->isAlive()) {
@@ -196,7 +199,6 @@ int StudentWorld::move() {
 	if (Finished_Level()) {
 		return GWSTATUS_FINISHED_LEVEL;
 	}
-	Remove_Dead_Game_Objects();
 
 	return GWSTATUS_CONTINUE_GAME;
 }
@@ -373,7 +375,8 @@ void StudentWorld::Remove_Dead_Game_Objects()
 		// If actor is a protester and still leaving field, skip
 		if (Protester* p = dynamic_cast<Protester*>(actor))
 		{
-			if (p->isLeavingField()) {
+			if (p->isLeavingField() && !p->hasReachedExit()) 
+			{
 				++it;
 				continue;
 			}
@@ -712,6 +715,7 @@ bool StudentWorld::Protester_Annoyed(int x, int y, int dmg, int sourceVal) {
 
 }
 
+// --- Pathfinding Functions ---
 std::vector<std::pair<int, int>> StudentWorld::getPathToExit(int startX, int startY) {
 	const int WIDTH = 64;
 	const int HEIGHT = 64;
@@ -758,7 +762,104 @@ std::vector<std::pair<int, int>> StudentWorld::getPathToExit(int startX, int sta
 	return path;
 }
 
-bool StudentWorld::Bribe_Nearby_Protester(int x, int y) {
+std::vector<std::pair<int, int>> StudentWorld::getPathToTarget(int startX, int startY, int goalX, int goalY)
+{
+	std::vector<std::pair<int, int>> path;
+
+	if (!_visited[startX][startY]) return {};
+
+	int x = startX, y = startY;
+	while (x != goalX || y != goalY) {
+		auto [prevX, prevY] = _cameFrom[x][y];
+		path.emplace_back(prevX, prevY);
+		x = prevX; y = prevY;
+	}
+
+	std::reverse(path.begin(), path.end());
+	return path;
+}
+
+std::vector<std::pair<int, int>> StudentWorld::computePathFromTo(int startX, int startY, int goalX, int goalY)
+{
+	std::vector<std::vector<bool>> visited(VIEW_WIDTH, std::vector<bool>(VIEW_HEIGHT, false));
+	std::vector<std::vector<std::pair<int, int>>> cameFrom(VIEW_WIDTH, std::vector<std::pair<int, int>>(VIEW_HEIGHT, { -1, -1 }));
+
+	std::queue<std::pair<int, int>> q;
+	q.push({ startX, startY });
+	visited[startX][startY] = true;
+
+	while (!q.empty()) {
+		auto [x, y] = q.front(); q.pop();
+		if (x == goalX && y == goalY) break;
+
+		for (auto [dx, dy] : std::vector<std::pair<int, int>>{ {-1,0},{1,0},{0,1},{0,-1} }) {
+			int nx = x + dx, ny = y + dy;
+			if (canMoveTo(nx, ny) && !visited[nx][ny]) {
+				visited[nx][ny] = true;
+				cameFrom[nx][ny] = { x, y };
+				q.push({ nx, ny });
+			}
+		}
+	}
+
+	// Reconstruct path
+	std::vector<std::pair<int, int>> path;
+	if (!visited[goalX][goalY]) return {}; // No path
+
+	int x = goalX, y = goalY;
+	while (x != startX || y != startY) {
+		auto [px, py] = cameFrom[x][y];
+		path.emplace_back(x, y);
+		x = px; y = py;
+	}
+
+	std::reverse(path.begin(), path.end());
+	return path;
+}
+
+void StudentWorld::computePathsToPlayer()
+{
+	if (_pathToPlayerComputed) return;  // Avoid recomputing within the same tick
+
+	// Initialize _visited and _cameFrom
+	_visited.assign(VIEW_WIDTH, std::vector<bool>(VIEW_HEIGHT, false));
+	_cameFrom.assign(VIEW_WIDTH, std::vector<std::pair<int, int>>(VIEW_HEIGHT, { -1, -1 }));
+
+	int startX = getIceman()->getX();
+	int startY = getIceman()->getY();
+
+	std::queue<std::pair<int, int>> q;
+	q.push({ startX, startY });
+	_visited[startX][startY] = true;
+
+	while (!q.empty()) 
+	{
+		auto [x, y] = q.front(); q.pop();
+
+		for (auto [dx, dy] : std::vector<std::pair<int, int>>{ {-1,0}, {1,0}, {0,1}, {0,-1} }) 
+		{
+			int nx = x + dx;
+			int ny = y + dy;
+
+			// Use grid bounds check (VIEW_WIDTH and VIEW_HEIGHT are typically 64)
+			if (nx >= 0 && nx < VIEW_WIDTH && ny >= 0 && ny < VIEW_HEIGHT &&
+				!_visited[nx][ny] && canMoveTo(nx, ny)) {
+
+				_visited[nx][ny] = true;
+				_cameFrom[nx][ny] = { x, y };
+				q.push({ nx, ny });
+			}
+		}
+	}
+	_pathToPlayerComputed = true;
+}
+
+void StudentWorld::resetPathCache()
+{
+	_pathToPlayerComputed = false;
+}
+
+Protester* StudentWorld::Bribe_Nearby_Protester(int x, int y) {
 	for (Actor* actor : _actors) {
 		if (!actor || !actor->isAlive()) continue;
 
@@ -768,14 +869,12 @@ bool StudentWorld::Bribe_Nearby_Protester(int x, int y) {
 			if (dx * dx + dy * dy <= 3 * 3) {
 				Protester* p = dynamic_cast<Protester*>(actor);
 				if (p && !p->isLeavingField()) {
-					p->bribe(); // Call custom bribe logic
-					increaseScore(25);
-					return true;
+					return p;  // returns the protester
 				}
 			}
 		}
 	}
-	return false;
+	return nullptr;
 }
 
 // Set_Position - Sets a 4x4 actor in a specified coordinate.
