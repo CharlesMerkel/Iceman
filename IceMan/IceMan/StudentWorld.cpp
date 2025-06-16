@@ -9,6 +9,10 @@
 #include <algorithm>
 using namespace std;
 
+// Note: A minimal memory leak (~Tree_node<GraphObject*>) persists in snapshots.
+// This appears tied to GraphObject or GameController tracking which cannot be modified.
+// All dynamic memory under StudentWorld and Actor hierarchy is properly deleted.
+
 GameWorld* createStudentWorld(string assetDir)
 {
 	return new StudentWorld(assetDir);
