@@ -99,7 +99,7 @@ public:
 
 
 private:
-	static const int _NUMIce = 3600;
+	static const int _NUMIce = 3616;
 	std::vector<Ice*> _ptrIce;
 	Iceman* _iceman;
 	int _Barrels = 0;
