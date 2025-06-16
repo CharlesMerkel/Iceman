@@ -24,7 +24,7 @@ ActorType Actor::getType() const { return ActorType::Unknown; } // Default imple
 // --- HasHP ---
 HasHP::HasHP(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world, int initialHealth)
     : Actor(imageID, startX, startY, dir, size, depth, world), _health(initialHealth) { }
-
+HasHP:: ~HasHP() { }
 // Decrease health by int amount
 void HasHP::decreaseHealth(int amount)
 {
@@ -188,7 +188,11 @@ Protester::Protester(int imageID, int startX, int startY, Direction dir, double 
 
     chooseNewDirection();
 }
-
+Protester::~Protester() 
+{
+    _exitPath.clear();
+    _exitPath.shrink_to_fit();
+}
 bool Protester::isAlive() const
 {
     return HasHP::isAlive() || isLeavingField();
@@ -395,6 +399,8 @@ void Protester::die()
 }
 
 // --- RegularProtestor ---
+RegularProtester::~RegularProtester() { }
+
 void RegularProtester::doSomething()
 {
     Protester::doSomething(); // Extend or override behavior
@@ -423,6 +429,11 @@ void RegularProtester::die()
 }
 
 // --- HardcoreProtestor ---
+HardcoreProtester::~HardcoreProtester() 
+{
+    _cachedPath.clear(); // Clear pathfinding cache memory
+    _cachedPath.shrink_to_fit();
+}
 void HardcoreProtester::doSomething()
 {
     if (!isAlive()) return;
@@ -438,7 +449,7 @@ void HardcoreProtester::doSomething()
     }
 
     int currTick = getWorld()->getTicks();
-
+	reduceShoutCooldown(); // Reduce shout cooldown each tick
     // --- Leaving ---
     if (isLeavingField())
     {
@@ -455,7 +466,7 @@ void HardcoreProtester::doSomething()
             _exitPath = getWorld()->getPathToExit(getX(), getY());
 
         if (_exitPath.empty()) {
-            _restingTime = getWorld()->getRestTime();
+            setRestingTime(getWorld()->getRestTime());
             return;
         }
 
@@ -472,7 +483,7 @@ void HardcoreProtester::doSomething()
         else if (dy < 0) setDirection(down);
 
         moveTo(nextX, nextY);
-        _restingTime = getWorld()->getRestTime();
+        setRestingTime(getWorld()->getRestTime());
         return;
     }
 
@@ -495,7 +506,7 @@ void HardcoreProtester::doSomething()
             getWorld()->playSound(SOUND_PROTESTER_YELL);
             getWorld()->getIceman()->annoy(2);
             resetShoutCooldown();
-            _restingTime = getWorld()->getRestTime();
+            setRestingTime(getWorld()->getRestTime());
             return;
         }
 
@@ -503,31 +514,25 @@ void HardcoreProtester::doSomething()
         return;
     }
 
-    // --- Line-of-Sight Movement (toward Iceman) ---
-    if (getWorld()->inLineOfSightToPlayer(getX(), getY(), dir))
-    {
-        setDirection(dir);
-        if (getWorld()->canMoveTo(getX(), getY(), dir))
-        {
-            moveTo(getX() + dxForDir(dir), getY() + dyForDir(dir));
-            _restingTime = getWorld()->getRestTime();
-            return;
-        }
-        _cachedPath.clear();
-    }
-
 	// --- Path to Iceman ---
     int M = 16 + getWorld()->getLevel() * 2;
+    // Recalculate if empty or older than 8 ticks
     if (_cachedPath.empty() || currTick - _lastPathUpdateTick >= 8) {
         _cachedPath = getWorld()->getPathToTarget(getX(), getY(), iceX, iceY);
+        _cachedPath.shrink_to_fit();
         _lastPathUpdateTick = currTick;
     }
 
-    // Re-check again to be safe
-    if (!_cachedPath.empty() && (int)_cachedPath.size() <= M) {
+    // Reject too-long paths
+    if (_cachedPath.size() > M) {
+        _cachedPath.clear();  // Ignore path if too far
+    }
+
+    if (!_cachedPath.empty()) {
         auto [nextX, nextY] = _cachedPath.front();
         _cachedPath.erase(_cachedPath.begin());
 
+        // Determine direction
         GraphObject::Direction moveDir;
         if (nextX > getX()) moveDir = right;
         else if (nextX < getX()) moveDir = left;
@@ -537,8 +542,11 @@ void HardcoreProtester::doSomething()
         if (getWorld()->canMoveTo(getX(), getY(), moveDir)) {
             setDirection(moveDir);
             moveTo(nextX, nextY);
-            _restingTime = getWorld()->getRestTime();
+            setRestingTime(getWorld()->getRestTime()); //This enforces 1 move per tick
             return;
+        }
+        else {
+            _cachedPath.clear(); // Clear if blocked
         }
     }
 
@@ -573,7 +581,7 @@ void HardcoreProtester::doSomething()
             if (getWorld()->canMoveTo(getX(), getY(), newDir)) {
                 moveTo(getX() + dxForDir(newDir), getY() + dyForDir(newDir));
                 _numStepsInCurrentDirection--;
-                _restingTime = getWorld()->getRestTime();
+                setRestingTime(getWorld()->getRestTime());
                 return;
             }
         }

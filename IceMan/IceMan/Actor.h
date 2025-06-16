@@ -96,7 +96,7 @@ class HasHP : public Actor
 {
 public:
     HasHP(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world, int initialHealth);
-    virtual ~HasHP() = default;
+    virtual ~HasHP() override;
 
     void decreaseHealth(int amount); 
     virtual bool isAlive() const;
@@ -172,10 +172,7 @@ class Protester : public HasHP
 public:
     Protester(int imageID, int startX, int startY, Direction dir, double size, unsigned int depth, StudentWorld* world);
 
-    virtual~Protester()
-    {
-        _exitPath.clear(); // Clear exit path on destruction
-    }
+    virtual ~Protester() override;
     virtual void doSomething() override;
     virtual void die() override;
 
@@ -226,10 +223,7 @@ public:
     {
         _health = 5;
     }
-    ~RegularProtester()
-    {
-		_exitPath.clear(); // Clear exit path on destruction
-	}
+    virtual ~RegularProtester() override;
     virtual ActorType getType() const override { return ActorType::RegularProtester; }
 	void bribe() override; // Override but just call base class
     virtual void doSomething() override;
@@ -246,11 +240,7 @@ public:
 		_health = 20;
         // Customize starting position or behavior as needed
     }
-    ~HardcoreProtester()
-    {
-        _exitPath.clear();
-        _cachedPath.clear(); // Clear cached path for Hardcore Protester
-    }
+    virtual ~HardcoreProtester() override;
     virtual ActorType getType() const override { return ActorType::HardcoreProtester; }
 	void bribe() override; // Override to handle bribing differently
     virtual void doSomething() override;

@@ -189,6 +189,7 @@ int StudentWorld::move() {
 
 	// --- Cleanup: Remove dead actors ---
 	Remove_Dead_Game_Objects();
+	resetPathCache(); // Reset pathfinding cache after each tick
 
 	// --- Lose conditions ---
 	if (_iceman && !_iceman->isAlive()) {
@@ -220,6 +221,8 @@ void StudentWorld::cleanUp() {
 		delete ice;
 	}
 	_ptrIce.clear();
+
+	resetPathCache(); // Reset pathfinding cache
 }
 
 //  --- Actor Management ---
@@ -361,7 +364,7 @@ bool StudentWorld::isPlayerStunned() const
 }
 
 // Remove_Dead_Game_Objects - Removes all dead actors & updates the actor's position.
-void StudentWorld::Remove_Dead_Game_Objects() 
+void StudentWorld::Remove_Dead_Game_Objects()
 {
 	for (auto it = _actors.begin(); it != _actors.end(); ) {
 		Actor* actor = *it;
@@ -372,24 +375,40 @@ void StudentWorld::Remove_Dead_Game_Objects()
 			continue;
 		}
 
-		// If actor is a protester and still leaving field, skip
+		// If actor is a Protester...
 		if (Protester* p = dynamic_cast<Protester*>(actor))
 		{
-			if (p->isLeavingField() && !p->hasReachedExit()) 
+			// CASE 1: Leaving field and has reached the exit — now safe to delete
+			if (p->isLeavingField() && p->hasReachedExit())
+			{
+				delete actor;
+				it = _actors.erase(it);
+				--_nProtesters;
+				continue;
+			}
+
+			// CASE 2: Leaving field but not yet at exit — keep alive
+			if (p->isLeavingField() && !p->hasReachedExit())
 			{
 				++it;
 				continue;
 			}
 		}
 
+		// CASE 3: All other actors that are now dead
 		if (!actor->isAlive()) {
 			Set_Position(actor->getX(), actor->getY(), 0);
-			if (dynamic_cast<Protester*>(actor) != nullptr) { --_nProtesters; }
+
+			if (dynamic_cast<Protester*>(actor) != nullptr) {
+				--_nProtesters;
+			}
 
 			delete actor;
-			it = _actors.erase(it); 
+			it = _actors.erase(it);
 		}
-		else { ++it; }
+		else {
+			++it;
+		}
 	}
 }
 
@@ -662,7 +681,7 @@ bool StudentWorld::canMoveTo(int x, int y) const
 
 int StudentWorld::getRestTime() const
 {
-	return std::max(0, static_cast<int>(3 - getLevel() / 4));
+	return std::max(1, static_cast<int>(3 - getLevel() / 4));
 }
 
 //  --- Gameplay & Interactions ---
@@ -764,15 +783,44 @@ std::vector<std::pair<int, int>> StudentWorld::getPathToExit(int startX, int sta
 
 std::vector<std::pair<int, int>> StudentWorld::getPathToTarget(int startX, int startY, int goalX, int goalY)
 {
+	std::vector<std::vector<bool>> visited(VIEW_WIDTH, std::vector<bool>(VIEW_HEIGHT, false));
+	std::vector<std::vector<std::pair<int, int>>> cameFrom(VIEW_WIDTH, std::vector<std::pair<int, int>>(VIEW_HEIGHT, { -1, -1 }));
+
+	std::queue<std::pair<int, int>> q;
+	q.push({ startX, startY });
+	visited[startX][startY] = true;
+
+	while (!q.empty()) {
+		auto [x, y] = q.front(); q.pop();
+
+		if (x == goalX && y == goalY) break;
+
+		for (auto [dx, dy] : std::vector<std::pair<int, int>>{ {-1,0},{1,0},{0,-1},{0,1} }) {
+			int nx = x + dx;
+			int ny = y + dy;
+
+			// Bounds check
+			if (nx < 0 || ny < 0 || nx >= VIEW_WIDTH || ny >= VIEW_HEIGHT)
+				continue;
+
+			// Respect ice and actor collisions
+			if (!visited[nx][ny] && canMoveTo(nx, ny)) {
+				visited[nx][ny] = true;
+				cameFrom[nx][ny] = { x, y };
+				q.push({ nx, ny });
+			}
+		}
+	}
+
+	// Reconstruct path
 	std::vector<std::pair<int, int>> path;
+	if (!visited[goalX][goalY]) return {}; // No path
 
-	if (!_visited[startX][startY]) return {};
-
-	int x = startX, y = startY;
-	while (x != goalX || y != goalY) {
-		auto [prevX, prevY] = _cameFrom[x][y];
-		path.emplace_back(prevX, prevY);
-		x = prevX; y = prevY;
+	int x = goalX, y = goalY;
+	while (x != startX || y != startY) {
+		path.emplace_back(x, y);
+		auto [px, py] = cameFrom[x][y];
+		x = px; y = py;
 	}
 
 	std::reverse(path.begin(), path.end());
@@ -814,6 +862,7 @@ std::vector<std::pair<int, int>> StudentWorld::computePathFromTo(int startX, int
 	}
 
 	std::reverse(path.begin(), path.end());
+	path.shrink_to_fit();
 	return path;
 }
 
@@ -857,6 +906,10 @@ void StudentWorld::computePathsToPlayer()
 void StudentWorld::resetPathCache()
 {
 	_pathToPlayerComputed = false;
+	_cameFrom.clear();
+	_cameFrom.shrink_to_fit();
+	_visited.clear();
+	_visited.shrink_to_fit();
 }
 
 Protester* StudentWorld::Bribe_Nearby_Protester(int x, int y) {
@@ -929,16 +982,20 @@ void StudentWorld::SpawnIce()
 bool StudentWorld::Remove_Ice_At(int x, int y)
 {
 	bool returnVal = false;
-	for (int i = 0; i < _NUMIce; i++)
+	for (int i = 0; i < _NUMIce; i++) {
 		if (_ptrIce[i] != nullptr) {
-			if (_ptrIce[i]->getX() >= x && _ptrIce[i]->getX() <= x + 3 && _ptrIce[i]->getY() >= y && _ptrIce[i]->getY() <= y + 3)
-			{
+			int ix = _ptrIce[i]->getX();
+			int iy = _ptrIce[i]->getY();
+
+			// Check for overlap with 4x4 block from (x,y)
+			if (ix >= x && ix < x + 4 && iy >= y && iy < y + 4) {
 				delete _ptrIce[i];
 				_ptrIce[i] = nullptr;
 				returnVal = true;
 			}
 		}
-	return returnVal; // No Ice returned
+	}
+	return returnVal;
 }
 
 //Destructor - Cleans up all actors and ice when the game world is destroyed. including forced closes.
