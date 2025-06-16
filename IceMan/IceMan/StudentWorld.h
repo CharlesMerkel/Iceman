@@ -68,8 +68,6 @@ public:
 	std::vector<std::pair<int, int>> getPathToExit(int startX, int startY);
 	std::vector<std::pair<int, int>> getPathToTarget(int startX, int startY, int goalX, int goalY);
 	std::vector<std::pair<int, int>> computePathFromTo(int startX, int startY, int goalX, int goalY);
-	void computePathsToPlayer();
-	void resetPathCache();
 
 	//  --- Game State & Level Progression ---
 
@@ -113,10 +111,6 @@ private:
 
 	char _actorPositions[64][64] = {};
 	std::list<Actor*> _actors; // List of actors in the game world
-
-	std::vector<std::vector<std::pair<int, int>>> _cameFrom;
-	std::vector<std::vector<bool>> _visited;
-	bool _pathToPlayerComputed = false;
 };
 
 #endif // STUDENTWORLD_H_

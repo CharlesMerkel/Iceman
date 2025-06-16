@@ -148,8 +148,6 @@ int StudentWorld::move() {
 	Update_Display_Text();
 	_ticks++;
 
-	_pathToPlayerComputed = false;
-
 	// --- Iceman Management ---
 	if(_iceman && _iceman->isAlive())
 	_iceman->doSomething(); //let the iceman act this tick
@@ -170,7 +168,6 @@ int StudentWorld::move() {
 	}
 
 	// --- Actor Management ---
-	if (!_pathToPlayerComputed) { computePathsToPlayer(); }
 
 	for (auto it = _actors.begin(); it != _actors.end(); ++it) 
 	{
@@ -189,7 +186,6 @@ int StudentWorld::move() {
 
 	// --- Cleanup: Remove dead actors ---
 	Remove_Dead_Game_Objects();
-	resetPathCache(); // Reset pathfinding cache after each tick
 
 	// --- Lose conditions ---
 	if (_iceman && !_iceman->isAlive()) {
@@ -221,8 +217,6 @@ void StudentWorld::cleanUp() {
 		delete ice;
 	}
 	_ptrIce.clear();
-
-	resetPathCache(); // Reset pathfinding cache
 }
 
 //  --- Actor Management ---
@@ -840,7 +834,7 @@ std::vector<std::pair<int, int>> StudentWorld::computePathFromTo(int startX, int
 		auto [x, y] = q.front(); q.pop();
 		if (x == goalX && y == goalY) break;
 
-		for (auto [dx, dy] : std::vector<std::pair<int, int>>{ {-1,0},{1,0},{0,1},{0,-1} }) {
+		for (auto [dx, dy] : std::vector<std::pair<int, int>>{ {-1,0}, {1,0}, {0,1}, {0,-1} }) {
 			int nx = x + dx, ny = y + dy;
 			if (canMoveTo(nx, ny) && !visited[nx][ny]) {
 				visited[nx][ny] = true;
@@ -852,64 +846,18 @@ std::vector<std::pair<int, int>> StudentWorld::computePathFromTo(int startX, int
 
 	// Reconstruct path
 	std::vector<std::pair<int, int>> path;
-	if (!visited[goalX][goalY]) return {}; // No path
+	if (!visited[goalX][goalY]) return {};
 
 	int x = goalX, y = goalY;
 	while (x != startX || y != startY) {
-		auto [px, py] = cameFrom[x][y];
 		path.emplace_back(x, y);
-		x = px; y = py;
+		std::tie(x, y) = cameFrom[x][y];
 	}
 
 	std::reverse(path.begin(), path.end());
 	path.shrink_to_fit();
+
 	return path;
-}
-
-void StudentWorld::computePathsToPlayer()
-{
-	if (_pathToPlayerComputed) return;  // Avoid recomputing within the same tick
-
-	// Initialize _visited and _cameFrom
-	_visited.assign(VIEW_WIDTH, std::vector<bool>(VIEW_HEIGHT, false));
-	_cameFrom.assign(VIEW_WIDTH, std::vector<std::pair<int, int>>(VIEW_HEIGHT, { -1, -1 }));
-
-	int startX = getIceman()->getX();
-	int startY = getIceman()->getY();
-
-	std::queue<std::pair<int, int>> q;
-	q.push({ startX, startY });
-	_visited[startX][startY] = true;
-
-	while (!q.empty()) 
-	{
-		auto [x, y] = q.front(); q.pop();
-
-		for (auto [dx, dy] : std::vector<std::pair<int, int>>{ {-1,0}, {1,0}, {0,1}, {0,-1} }) 
-		{
-			int nx = x + dx;
-			int ny = y + dy;
-
-			// Use grid bounds check
-			if (nx >= 0 && nx < VIEW_WIDTH && ny >= 0 && ny < VIEW_HEIGHT &&
-				!_visited[nx][ny] && canMoveTo(nx, ny)) {
-
-				_visited[nx][ny] = true;
-				_cameFrom[nx][ny] = { x, y };
-				q.push({ nx, ny });
-			}
-		}
-	}
-	_pathToPlayerComputed = true;
-}
-
-void StudentWorld::resetPathCache()
-{
-	_pathToPlayerComputed = false;
-	_cameFrom.clear();
-	_cameFrom.shrink_to_fit();
-	_visited.clear();
-	_visited.shrink_to_fit();
 }
 
 Protester* StudentWorld::Bribe_Nearby_Protester(int x, int y) {
@@ -966,7 +914,11 @@ void StudentWorld::Sonar_Used(int x, int y) {
 // Spawn_Ice - Spawns ice in the grid, ensuring that the tunnel space is not filled with ice.
 void StudentWorld::SpawnIce() 
 {
+	for (Ice* ice : _ptrIce) {
+		delete ice;
+	}
 	_ptrIce.clear();
+	_ptrIce.shrink_to_fit();
 	for (int x = 0; x < 64; x++)
 	{
 		for (int y = 0; y < 60; y++)
