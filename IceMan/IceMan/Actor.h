@@ -136,7 +136,6 @@ public:
     void sonarAmmoIncrease() { _sonarAmmo++; }
     void goldAmmoIncrease() { _goldAmmo++; }
     void waterAmmoIncrease() { _waterAmmo += 5; }
-    void oilGet();
 
     //score and life
     int getScore() const;
@@ -238,7 +237,6 @@ public:
         : Protester(IID_HARD_CORE_PROTESTER, 60, 60, left, 1.0, 0, world)
     {
 		_health = 20;
-        // Customize starting position or behavior as needed
     }
     virtual ~HardcoreProtester() override;
     virtual ActorType getType() const override { return ActorType::HardcoreProtester; }
@@ -274,13 +272,6 @@ public:
     void reduceTick() { _tickSpan--; }
 
     void setTick(int amt) { _tickSpan = amt; }
-
-protected:
-    void showPickup();
-    void sonarPickup();
-    void goldPickup();
-    void waterPickup();
-
 private:
     bool _pickVisible;
     bool _pickUpExists = false;

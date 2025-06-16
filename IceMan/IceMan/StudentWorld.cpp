@@ -239,30 +239,6 @@ void StudentWorld::spawnPowerUps() {
 				_actors.push_back(new WaterPool(x, y, this));
 		}
 	}
-
-	//orignal code
-		//int dropChance = getLevel() * 25 + 300;
-	//int n = rand() % dropChance + 1;
-
-	//if (n <= 1)
-	//{
-	//	int chance = rand() % 5 + 1;
-
-	//	if (chance <= 1)
-	//	{ _actors.push_back(new Sonar(this)); }
-
-	//	else if (chance > 1){
-	//		int x = rand() % 61;
-	//		int y = rand() % 61;
-
-	//		while (!Can_Add_Waterpool(x, y)){
-	//			x = rand() % 61;
-	//			y = rand() % 61;
-	//		}
-
-	//		_actors.push_back(new WaterPool(x, y, this));
-	//	}
-	//}
 }
 
 // Can_Face - Checks if the Actor can face the Iceman based off of its coordinates &

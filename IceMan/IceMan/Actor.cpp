@@ -830,27 +830,33 @@ Sonar::Sonar(StudentWorld* world)
     : PickUp(IID_SONAR, 0, 60, right, 1.0, 2, world) {
     setVisible(true);
     setPickup(true);
+    setTick(std::max(100u, static_cast<unsigned int>(300 - 10 * getWorld()->getLevel())));
 }
 
-void Sonar::doSomething() { 
-    /* Sonar logic */ 
-    if (!isAlive()) { return; }
+void Sonar::doSomething() {
+    if (!isAlive()) return;
 
     if (getWorld()->Near_Iceman(getX(), getY(), 3)) {
         setDead();
         getWorld()->increaseScore(75);
         getWorld()->Iceman_ptr()->sonarAmmoIncrease();
         GameController::getInstance().playSound(SOUND_GOT_GOODIE);
+        return;
     }
 
-    else if (getTick() == 0) { setDead(); }
     reduceTick();
+
+    if (getTick() <= 0) {
+        setDead();
+        return;
+    }
 }
 
 WaterPool::WaterPool(int startX, int startY, StudentWorld* world)
     : PickUp(IID_WATER_POOL, startX, startY, right, 1.0, 2, world) {
     setVisible(true);
     setPickup(true);
+    setTick(std::max(100u, static_cast<unsigned int>(300 - 10 * getWorld()->getLevel())));
 }
 
 void WaterPool::doSomething() { 
